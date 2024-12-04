@@ -29,13 +29,6 @@ const getMarkdown = async (value, privateKey) => {
   // Ensure the Dataset is valid before parsing
   let parsedData;
 
-  // const privateKey =
-  //   "5f9b0c9ee1eba7149d5855dbfb9d51b489e652f8a4bc2bd66b1ee31244457e11";
-  // if (!privateKey) {
-  //   console.error("Private key is required.");
-  //   return;
-  // }
-
   if (JobData?.Dataset) {
     try {
       // Try to parse the Dataset if it exists

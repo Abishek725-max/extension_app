@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { registerWebSocket } from "./background";
 
 export const ethersConnect = async (
   jobData,
@@ -128,23 +127,54 @@ export const ethersConnect = async (
     // );
 
     signedDataArray.push({
-      completed_at: jobWithSign.completed_at,
       job_details: JSON.stringify(jobWithSign.job_details),
-      message: jobWithSign.message,
-      output: jobWithSign.output,
-      ref: jobWithSign.ref,
       signature: jobWithSign.signature,
-      status: jobWithSign.status,
     });
 
+    if (Array.isArray(signedDataArray) && signedDataArray.length > 0) {
+      const message = {
+        completed_at: new Date().toISOString(),
+        message: "",
+        output: "",
+        ref: JobData.UUID,
+        status: true,
+        tx_requests: signedDataArray,
+      };
+
+      console.log(wsClient.isConnected, "!wsClient.isConnected");
+
+      if (wsClient.isConnected) {
+        console.log("log");
+        wsClient.connect(); // Reconnect if disconnected
+        wsClient.jobCompletion(JobData.UUID, message);
+      } else {
+        console.log("log1");
+
+        wsClient.reconnect();
+        wsClient.jobCompletion(JobData.UUID, message);
+      }
+    } else {
+      console.warn("No valid data to send.");
+    }
+
     if (signedDataArray.length > 0) {
-      const wsService = new WebSocket("ws://192.168.83.182:9999");
+      const message = {
+        completed_at: new Date().toISOString(),
+        message: "",
+        output: "",
+        ref: jobData?.UUID,
+        status: true,
+        tx_requests: signedDataArray,
+      };
+      const wsService = new WebSocket(
+        "wss://orchestrator.openledger.dev/ws/v1/orch"
+      );
       wsService.onopen = () => {
         wsService.send(
           JSON.stringify({
-            workerID: "Extension",
+            workerID: `chrome-extension://${chrome.runtime.id}`,
             msgType: "JOB_COMPLETION",
-            MultipleJobDetails: signedDataArray,
+            message: message,
           })
         );
       };

@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { validatePrivateKey } from "@/utils/common";
 import logo from "../../assets/images/icon.png";
 import { Image } from "@nextui-org/react";
-import Lottie from "lottie-react";
+
 // import { WebSocketClient } from "@/utils/WebSocketClient";
 
 const ImportWallet = () => {

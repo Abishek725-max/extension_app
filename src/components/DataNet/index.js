@@ -3,7 +3,7 @@ import DataNetsCard from "../../components/DataNet/DataNetsCard";
 import { Tabs, Tab } from "@nextui-org/react";
 import CreateDataNetButton from "../CreateDataNetButton";
 import useWindowUtils from "../../utils/useWindowUtils";
-import { dataSetsList } from "../../utils/base-methods";
+// import { dataSetsList } from "../../utils/base-methods";
 
 const DataNetTabs = ({
   gridClassName = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-3 gap-5",

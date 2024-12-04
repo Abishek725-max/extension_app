@@ -11,7 +11,8 @@ export const uploadMinio = async (
   data,
   jobData,
   privateKey,
-  contentType = "text/markdown"
+  contentType = "text/markdown",
+  maxRetries = 3
 ) => {
   console.log("uploadMInio Pgae", privateKey);
 
@@ -38,19 +39,28 @@ export const uploadMinio = async (
     Body: bodyBuffer,
     ContentType: contentType,
   };
+
+  let retries = 0;
   console.log("🚀 ~ params:", params);
+  while (retries < maxRetries) {
+    try {
+      const commend = new PutObjectCommand(params);
+      const response = await s3Client.send(commend);
+      console.log("Successfully uploaded to MinIO:", response);
 
-  try {
-    const commend = new PutObjectCommand(params);
-    const response = await s3Client.send(commend);
-    console.log("Successfully uploaded to MinIO:", response);
-
-    console.log("🚀 ~ checksum:", checksum);
-    storeJobData(jobData);
-    console.log("🚀 ~ jobData:", jobData);
-    ethersConnect(jobData, checksum, checksumCreateTime, privateKey);
-  } catch (error) {
-    console.error("Error uploading to MinIO:", error);
+      console.log("🚀 ~ checksum:", checksum);
+      storeJobData(jobData);
+      console.log("🚀 ~ jobData:", jobData);
+      ethersConnect(jobData, checksum, checksumCreateTime, privateKey);
+    } catch (error) {
+      retries++;
+      console.error("Error uploading to MinIO:", error?.message, error);
+      console.log(retries, maxRetries, "maxRetries test");
+      if (retries === maxRetries) {
+      } else {
+        console.log(`Retrying upload... Attempt ${retries + 1}`);
+      }
+    }
   }
   return { checksum, checksumCreateTime };
 };
