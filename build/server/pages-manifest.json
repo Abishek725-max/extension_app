@@ -1,0 +1,10 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/welcome": "pages/welcome.js",
+  "/import-wallet": "pages/import-wallet.js",
+  "/choose-wallet": "pages/choose-wallet.js",
+  "/home": "pages/home.js",
+  "/": "pages/index.js"
+}
