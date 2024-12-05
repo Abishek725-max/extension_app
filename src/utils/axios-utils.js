@@ -1,5 +1,6 @@
 import axios from "axios";
 import Router from "next/router"; // Import Router from Next.js
+import { clearLocalStorage, getLocalStorage } from "./common";
 
 let BASE_URL = "https://dataapi.openledger.dev/api/v1/";
 
@@ -10,7 +11,7 @@ const appAxios = axios.create({
 appAxios.interceptors.request.use(
   async function (config) {
     try {
-      const auth_token = localStorage?.getItem("auth_token"); // Retrieve token from localStorage
+      const auth_token = await getLocalStorage("auth_token"); // Retrieve token from localStorage
       if (auth_token) {
         config.headers.Authorization = `Bearer ${auth_token}`;
       }
@@ -50,8 +51,9 @@ appAxios.interceptors.response.use(
       console.error("Unauthorized (401): Token expired or invalid.");
 
       // Remove the expired token from storage and redirect
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("privateKey");
+      // localStorage.removeItem("auth_token");
+      // localStorage.removeItem("privateKey");
+      clearLocalStorage();
 
       // Redirect user to login or welcome page
       Router.push("/welcome");

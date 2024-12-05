@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 import Profile from "../../assets/images/profile.png";
 import { Image } from "@nextui-org/react";
-import { truncateAddress } from "@/utils/common";
+import { getLocalStorage, truncateAddress } from "@/utils/common";
 import { useRouter } from "next/router";
 
 const WalletDetail = () => {
@@ -35,7 +35,7 @@ const WalletDetail = () => {
 
   const walletDetailGet = async () => {
     try {
-      const privateKey = localStorage?.getItem("privateKey");
+      const privateKey = await getLocalStorage("privateKey");
       const wallet = new ethers.Wallet(privateKey);
       setwalletData(wallet);
       const balanceJson = await Promise.all([
@@ -46,6 +46,10 @@ const WalletDetail = () => {
     } catch (error) {
       console.error("Error initializing ", error);
     }
+  };
+  const getPrivateKey = async () => {
+    let privateKey = await getLocalStorage("privateKey");
+    return privateKey;
   };
   return (
     <div>
@@ -66,7 +70,7 @@ const WalletDetail = () => {
         <p>Scan Your Private Key</p>
         <p>or</p>
         <p> Private Key </p> {"\n"}
-        <p> {localStorage?.getItem("privateKey")}</p>
+        <p> {getPrivateKey()}</p>
         <button
           type="button"
           onClick={handleExportWalletClose}

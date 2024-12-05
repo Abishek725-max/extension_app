@@ -34,11 +34,6 @@ export const calculateTimeAgo = (lastUpdate) => {
   return `${diffInYears} years ago`;
 };
 
-export const getPrivateKey = () => {
-  let privatekey = localStorage?.getItem("privateKey");
-  return privatekey;
-};
-
 export const validatePrivateKey = (key) => {
   const regex = /^[a-fA-F0-9]{64}$/;
   if (key.startsWith("0x")) {
@@ -156,9 +151,17 @@ export function setLocalStorage(key, value) {
       .catch(reject);
   });
 }
+export function clearLocalStorage() {
+  chrome.storage.local.clear(function () {
+    if (chrome.runtime.lastError) {
+      console.error("Error clearing storage:", chrome.runtime.lastError);
+    } else {
+      console.log("Storage cleared successfully!");
+    }
+  });
+}
 
 export const handleCopytoClipboard = (keydata, valuedata, setChangeCopy) => {
-
   navigator.clipboard.writeText(valuedata).then(() => {
     setChangeCopy(keydata);
     setTimeout(() => {

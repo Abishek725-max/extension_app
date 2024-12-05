@@ -1,9 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-
 // tailwind.config.js
 import { nextui } from "@nextui-org/react";
 
-module.exports = {
+export default {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
     "./src/pages/**/*.{js,ts,jsx,tsx}", // Include Next.js pages
@@ -12,20 +10,11 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: "576px",
-      // => @media (min-width: 576px) { ... }
-
-      md: "767px",
-      // => @media (min-width: 767px) { ... }
-
-      lg: "992px",
-      // => @media (min-width: 992px) { ... }
-
-      xl: "1200px",
-      // => @media (min-width: 1200px) { ... }
-
-      xxl: "1400px",
-      // => @media (min-width: 1400px) { ... }
+      sm: "576px", // => @media (min-width: 576px) { ... }
+      md: "767px", // => @media (min-width: 767px) { ... }
+      lg: "992px", // => @media (min-width: 992px) { ... }
+      xl: "1200px", // => @media (min-width: 1200px) { ... }
+      xxl: "1400px", // => @media (min-width: 1400px) { ... }
     },
     extend: {
       backgroundImage: {

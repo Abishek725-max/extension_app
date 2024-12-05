@@ -1,13 +1,9 @@
-import MainLayout from "@/main-layout";
-import Dashboard from "../components/dashboard";
-import { useEffect } from "react";
+import Welcome from "./welcome";
 
 export default function Home() {
   return (
     <>
-      <MainLayout>
-        <Dashboard />
-      </MainLayout>
+      <Welcome />
     </>
   );
 }

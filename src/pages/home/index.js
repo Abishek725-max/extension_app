@@ -13,7 +13,12 @@ import {
   getRewardsTotal,
 } from "@/utils/base-methods";
 import PointsStatistics from "@/components/dashboard/PointsStatistics ";
-import { formatNumber, truncateAddress } from "@/utils/common";
+import {
+  formatNumber,
+  getLocalStorage,
+  setLocalStorage,
+  truncateAddress,
+} from "@/utils/common";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import TimeCounter from "@/components/time-counter";
@@ -23,6 +28,7 @@ import { validatePrivateKey } from "@/utils/common";
 import { ethers } from "ethers";
 import { generateToken } from "@/utils/base-methods";
 import ReferToReward from "@/components/ReferToReward";
+import { get } from "axios";
 
 const Home = () => {
   const router = useRouter();
@@ -39,14 +45,16 @@ const Home = () => {
 
   const getJobsValue = async () => {
     // const result = await getDataWithId("jobData");
-    const result = localStorage?.getItem("jobData");
+    const result = await getLocalStorage("jobData");
     setJobDataValues(result);
     console.log("Jobs Result:", result);
   };
 
   const getPrivateKeyValue = async () => {
     // const result = await getDataWithId("privateKey");
-    const result = localStorage?.getItem("privateKey");
+    const result = await getLocalStorage("privateKey");
+    const extensionID = await getLocalStorage("extensionID");
+    console.log("privateKeyValue in Home", result, extensionID);
     setPrivateKey(result);
   };
 
@@ -79,28 +87,20 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    window.postMessage(
-      { type: "send_privatekey", value: localStorage?.getItem("privateKey") },
-      "*"
-    );
-
-    window.postMessage({ type: "send_jobdata", value: "" }, "*");
-
-    window.addEventListener("message", (event) => {
-      console.log("Received data in content script: webpage", event);
-      if (event?.data?.type === "getJobData") {
-        localStorage.setItem("allJobData", JSON?.stringify(event?.data?.value));
-        setAllJobData(event?.data?.value);
-      }
-    });
+    getJobData();
   }, []);
+
+  const getJobData = async () => {
+    const jobResult = await getLocalStorage("jobData");
+    setAllJobData(jobResult);
+  };
 
   const initialize = async () => {
     try {
       const wallet = new ethers.Wallet(privateKey);
       setWalletData(wallet);
       const wsService = new WebSocket(process.env.NEXT_PUBLIC_WS_URL);
-      let extensionID = localStorage?.getItem("extensionID");
+      let extensionID = await getLocalStorage("extensionID");
       wsService.onopen = () => {
         console.log("WebSocket is connected. in Home");
         wsService?.send(
@@ -121,13 +121,13 @@ const Home = () => {
         );
       };
 
-      wsService.onmessage = (value) => {
+      wsService.onmessage = async (value) => {
         console.log("Received job message:", JSON?.parse(value?.data));
         let message = JSON?.parse(value?.data);
         if (message?.status === false) {
           router?.push(`/register-failed?reason=${message?.message}`);
         } else if (message?.status === true) {
-          const authToken = localStorage?.getItem("auth_token");
+          const authToken = await getLocalStorage("auth_token");
           if (!authToken) {
             handleGenerateToken(wallet?.address);
           }
@@ -157,9 +157,6 @@ const Home = () => {
     try {
       const response = await getRewardsHistory();
       if (response) {
-        // const {
-        //   data: { data },
-        // } = response;
         setRewardsHistoryData(response?.data);
       }
     } catch (error) {
@@ -214,47 +211,6 @@ const Home = () => {
             <p className="ml-auto text-xs font-medium text-white">
               {truncateAddress(walletData?.address, 20)}
             </p>
-            {/* <div
-              className="cursor-pointer"
-              onClick={() =>
-                handleCopytoClipboard(
-                  walletData?.address,
-                  walletData?.address,
-                  setChangeCopy
-                )
-              }
-            >
-              {changeCopy ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="#ffffff"
-                  className="size-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m4.5 12.75 6 6 9-13.5"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  width="20"
-                  height="20"
-                  className="w-4 h-4"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M16.875 2.5H6.875C6.70924 2.5 6.55027 2.56585 6.43306 2.68306C6.31585 2.80027 6.25 2.95924 6.25 3.125V6.25H3.125C2.95924 6.25 2.80027 6.31585 2.68306 6.43306C2.56585 6.55027 2.5 6.70924 2.5 6.875V16.875C2.5 17.0408 2.56585 17.1997 2.68306 17.3169C2.80027 17.4342 2.95924 17.5 3.125 17.5H13.125C13.2908 17.5 13.4497 17.4342 13.5669 17.3169C13.6842 17.1997 13.75 17.0408 13.75 16.875V13.75H16.875C17.0408 13.75 17.1997 13.6842 17.3169 13.5669C17.4342 13.4497 17.5 13.2908 17.5 13.125V3.125C17.5 2.95924 17.4342 2.80027 17.3169 2.68306C17.1997 2.56585 17.0408 2.5 16.875 2.5ZM12.5 16.25H3.75V7.5H12.5V16.25ZM16.25 12.5H13.75V6.875C13.75 6.70924 13.6842 6.55027 13.5669 6.43306C13.4497 6.31585 13.2908 6.25 13.125 6.25H7.5V3.75H16.25V12.5Z"
-                    fill="#ffffff"
-                  />
-                </svg>
-              )}
-            </div> */}
             <CopyToClipboard
               text={walletData?.address}
               onCopy={() => setChangeCopy(true)}
@@ -304,7 +260,8 @@ const Home = () => {
             </div>
             <div className="flex flex-col gap-1.5">
               <h4 className="font-bold text-2xl text-white text-right">
-                {rewardsTotal ? formatNumber(rewardsTotal) : 0} PTS {/* */}
+                {rewardsRealtimeData?.total ? rewardsRealtimeData?.total : 0}{" "}
+                PTS {/* */}
               </h4>
               <p className="text-xs font-medium text-[#FFFFFF99] text-right">
                 Today&apos;s Earnings

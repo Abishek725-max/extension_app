@@ -3,6 +3,9 @@ import getMarkdown from "./getMarkdown";
 let socket = null;
 let reconnectTimeout = null;
 const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+
+console.log("ENV URL", process.env.NEXT_PUBLIC_WS_URL);
+
 // const url = "ws://192.168.18.129:9999";
 
 chrome?.runtime.onInstalled.addListener(() => {

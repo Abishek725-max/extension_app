@@ -8,7 +8,7 @@
 }
 
 .dark {
-  --background: #0D0D0D;
+  --background: #0d0d0d;
   --foreground: #ededed;
 }
 
@@ -16,6 +16,12 @@ body {
   color: var(--foreground);
   background: var(--background);
   min-height: 100vh;
+}
+
+/* Enable only while building extension */
+body {
+  width: 400px !important;
+  height: 700px !important;
 }
 
 @layer utilities {

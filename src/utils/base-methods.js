@@ -1,3 +1,4 @@
+import { Slide, toast } from "react-toastify";
 import baseAxios from "./axios-utils";
 // console.log('🚀 ~ baseAxios:', baseAxios);
 
@@ -68,5 +69,16 @@ export const getDailyRewardStatus = async () => {
     return response.data;
   } catch (error) {
     console.log("Error reward Total:", error);
+    toast?.error(error?.response?.data?.message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Slide,
+    });
   }
 };

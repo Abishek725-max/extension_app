@@ -12,27 +12,19 @@ import {
   Button,
 } from "@nextui-org/react";
 import { getDataWithId } from "@/utils/indexed-db";
+import { getLocalStorage, setLocalStorage } from "@/utils/common";
 
 const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
     handleCallback();
-    // window.postMessage(
-    //   { type: "SEND_DATA", payload: "testingggg" },
-    //   window.origin
-    // );
-
-    window.addEventListener("message", (event) => {
-      console.log("Received data in content script: Webpage", event);
-    });
-
-    // window?.postMessage({ type: "message" }, "*");
+    setLocalStorage("extensionID", chrome.runtime.id);
   }, []);
 
   const handleCallback = async () => {
     // const result = await getDataWithId("privateKey");
-    const result = localStorage?.getItem("privateKey");
+    const result = await getLocalStorage("privateKey");
     console.log("Result:", result);
 
     setTimeout(async () => {

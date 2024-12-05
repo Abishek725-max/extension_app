@@ -7,7 +7,11 @@ import { useRouter } from "next/router";
 import { ethers } from "ethers";
 import { generateToken } from "@/utils/base-methods";
 import { v4 as uuidv4 } from "uuid";
-import { validatePrivateKey } from "@/utils/common";
+import {
+  getLocalStorage,
+  setLocalStorage,
+  validatePrivateKey,
+} from "@/utils/common";
 import logo from "../../assets/images/icon.png";
 import { Image } from "@nextui-org/react";
 
@@ -35,7 +39,8 @@ const ImportWallet = () => {
       showToast("Invalid private key format. Ensure it is 64 hex characters.");
       return;
     }
-    localStorage.setItem("privateKey", privateKeyValue);
+    // localStorage.setItem("privateKey", privateKeyValue);
+    setLocalStorage("privateKey", privateKeyValue);
     initialize();
   };
 
@@ -44,8 +49,8 @@ const ImportWallet = () => {
 
     window.addEventListener("message", (event) => {
       if (event?.data?.type === "sendExtensionId") {
-        localStorage.setItem("extensionID", event?.data?.value);
-        setExtensionID(event?.data?.value);
+        // localStorage.setItem("extensionID", event?.data?.value);
+        // setExtensionID(event?.data?.value);
       }
     });
   }, []);
@@ -89,14 +94,14 @@ const ImportWallet = () => {
         );
       };
 
-      wsService.onmessage = (value) => {
+      wsService.onmessage = async (value) => {
         console.log("Received job message:", JSON?.parse(value?.data));
         let message = JSON?.parse(value?.data);
 
         if (message?.status === false) {
           router?.push(`/register-failed?reason=${message?.message}`);
         } else if (message?.status === true) {
-          const authToken = localStorage?.getItem("auth_token");
+          const authToken = await getLocalStorage("auth_token");
           if (!authToken) {
             handleGenerateToken(wallet?.address);
           }
@@ -114,7 +119,7 @@ const ImportWallet = () => {
   const handleGenerateToken = async (address) => {
     try {
       const tokenData = await generateToken(address);
-      localStorage.setItem("auth_token", tokenData.data.token);
+      setLocalStorage("auth_token", tokenData.data.token);
       router?.push("/home");
     } catch (error) {
       console.error("Failed to generate token", error);

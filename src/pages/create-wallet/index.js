@@ -6,6 +6,7 @@ import { Image } from "@nextui-org/react";
 import IconLogo from "@/assets/images/icon.png";
 
 import { ethers } from "ethers";
+import { setLocalStorage } from "@/utils/common";
 
 // import { WebSocketClient } from "@/utils/WebSocketClient";
 
@@ -37,7 +38,8 @@ const CreateWallet = () => {
   // };
 
   const handleWalletSetup = () => {
-    localStorage.setItem("privateKey", privateKey);
+    // localStorage.setItem("privateKey", privateKey);
+    setLocalStorage("privateKey", privateKey);
     router?.push("/home");
   };
 

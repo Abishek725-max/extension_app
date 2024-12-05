@@ -93,6 +93,7 @@ const ClaimRewards = () => {
       }
     } catch (error) {
       console.log("🚀 ~ handlegetDailyRewardStatus ~ error:", error);
+
       if (error !== undefined && error?.data?.status === 404) {
         setDailyRewardDataStatus(error?.data);
       }

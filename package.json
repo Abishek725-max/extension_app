@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "webpack --config webpack.config.js",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:webpack": "webpack --config webpack.config.js",
+    "ext-build": "EXTENSION_BUILD=TRUE next build && rm -rf ./extension/* && rm -rf ./dist/* && npm run build:webpack && mv ./build/_next ./build/next && mv ./build/* ./extension/ && mv ./dist/* ./extension/ && cd ./extension && grep -rli '_next' * | xargs -I@ sed -i '' 's|/_next|/next|g' @ && cp .env.local ./extension/ || echo '.env.local not found, skipping move.'",
+    "move-env": "cp .env.local ./extension/"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.689.0",
@@ -26,6 +29,7 @@
     "crypto-js": "^4.2.0",
     "css-loader": "^7.1.2",
     "dayjs": "^1.11.13",
+    "dotenv-webpack": "^8.1.0",
     "ethers": "5.7.2",
     "framer-motion": "^11.11.9",
     "html-loader": "^5.1.0",

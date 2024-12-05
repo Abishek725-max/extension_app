@@ -1,6 +1,6 @@
 // const value = "privatekeyVAlueesetup";
 
-const { getLocalStorage } = require("./utils/common");
+const { getLocalStorage, setLocalStorage } = require("./utils/common");
 
 console.log("Content script loaded");
 
@@ -13,6 +13,7 @@ console.log("Content script loaded");
 
 const extensionId = chrome.runtime.id;
 console.log("Extension ID:", extensionId);
+setLocalStorage("Extension ID", extensionId);
 
 const currentHost = window.location.hostname;
 console.log("Current Host:", currentHost);
