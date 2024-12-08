@@ -131,31 +131,7 @@ export const ethersConnect = async (
       signature: jobWithSign.signature,
     });
 
-    if (Array.isArray(signedDataArray) && signedDataArray.length > 0) {
-      const message = {
-        completed_at: new Date().toISOString(),
-        message: "",
-        output: "",
-        ref: JobData.UUID,
-        status: true,
-        tx_requests: signedDataArray,
-      };
-
-      console.log(wsClient.isConnected, "!wsClient.isConnected");
-
-      if (wsClient.isConnected) {
-        console.log("log");
-        wsClient.connect(); // Reconnect if disconnected
-        wsClient.jobCompletion(JobData.UUID, message);
-      } else {
-        console.log("log1");
-
-        wsClient.reconnect();
-        wsClient.jobCompletion(JobData.UUID, message);
-      }
-    } else {
-      console.warn("No valid data to send.");
-    }
+    console.log("signedDataArray", signedDataArray.length);
 
     if (signedDataArray.length > 0) {
       const message = {
@@ -166,18 +142,23 @@ export const ethersConnect = async (
         status: true,
         tx_requests: signedDataArray,
       };
-      const wsService = new WebSocket(
-        "wss://orchestrator.openledger.dev/ws/v1/orch"
-      );
-      wsService.onopen = () => {
-        wsService.send(
-          JSON.stringify({
+      chrome.runtime.sendMessage(
+        {
+          type: "sent_completion",
+          data: JSON.stringify({
             workerID: `chrome-extension://${chrome.runtime.id}`,
             msgType: "JOB_COMPLETION",
             message: message,
-          })
-        );
-      };
+          }),
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.error("Message sending failed:", chrome.runtime.lastError);
+          } else {
+            console.log("Response from content script:", response);
+          }
+        }
+      );
     } else {
       console.warn("No valid data to send.");
     }

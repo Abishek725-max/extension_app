@@ -72,21 +72,6 @@ const Home = () => {
   // React useEffect in your app
 
   useEffect(() => {
-    const ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL);
-
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("SOCKETJOBDATA", event);
-      window.postMessage({ type: "send_jobdata", value: "" }, "*");
-      if (message.type === "job_data") {
-        setData(message.message);
-      }
-    };
-
-    return () => ws.close();
-  }, []);
-
-  useEffect(() => {
     getJobData();
   }, []);
 
@@ -99,12 +84,11 @@ const Home = () => {
     try {
       const wallet = new ethers.Wallet(privateKey);
       setWalletData(wallet);
-      const wsService = new WebSocket(process.env.NEXT_PUBLIC_WS_URL);
       let extensionID = await getLocalStorage("extensionID");
-      wsService.onopen = () => {
-        console.log("WebSocket is connected. in Home");
-        wsService?.send(
-          JSON.stringify({
+      chrome.runtime.sendMessage(
+        {
+          type: "send_websocket_message",
+          data: JSON.stringify({
             workerID: `chrome-extension://${extensionID}`,
             msgType: "REGISTER",
             message: {
@@ -117,22 +101,21 @@ const Home = () => {
                 type: "Extension",
               },
             },
-          })
-        );
-      };
-
-      wsService.onmessage = async (value) => {
-        console.log("Received job message:", JSON?.parse(value?.data));
-        let message = JSON?.parse(value?.data);
-        if (message?.status === false) {
-          router?.push(`/register-failed?reason=${message?.message}`);
-        } else if (message?.status === true) {
-          const authToken = await getLocalStorage("auth_token");
-          if (!authToken) {
-            handleGenerateToken(wallet?.address);
+          }),
+        },
+        async (response) => {
+          console.log("Response:", response);
+          let message = JSON?.parse(response);
+          if (message?.status === false) {
+            router?.push(`/register-failed?reason=${message?.message}`);
+          } else if (message?.status === true) {
+            const authToken = await getLocalStorage("auth_token");
+            if (!authToken) {
+              handleGenerateToken(wallet?.address);
+            }
           }
         }
-      };
+      );
     } catch (error) {
       console.error("Error during registration:", error);
     }

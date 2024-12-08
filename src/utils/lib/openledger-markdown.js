@@ -1,48 +1,80 @@
-import { NodeHtmlMarkdown } from "node-html-markdown";
+import { useState, useEffect } from "react";
 
-export async function fetchHtmlToJson(url) {
+import TurndownService from "turndown";
+import { JSDOM } from "jsdom";
+
+// Replace the JSDOM logic with native DOM manipulation and fetch
+export const fetchHtmlToMarkdown = async (url) => {
   try {
+    // Fetch the HTML content of the URL
     const response = await fetch(url);
     const htmlText = await response.text();
 
-    // Step 1: Remove unwanted tags and inline styles using regex
-    const cleanedHtmlText = htmlText
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-      .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, "")
-      .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, "")
-      .replace(/<meta[^>]*>/gi, "")
-      .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, "")
-      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
-      .replace(/\sstyle="[^"]*"/gi, ""); // Remove inline styles
-    console.log("====== 1. before markdown conversion =====");
+    // Parse the HTML content using the browser's DOMParser (works in the browser)
+    const dom = new JSDOM(htmlText);
+    const doc = dom.window.document;
+    // const doc = parser.parseFromString(htmlText, "text/html");
 
-    // Step 2: Convert the cleaned HTML to Markdown using node-html-markdown
-    const markdown = NodeHtmlMarkdown.translate(cleanedHtmlText);
-    // console.log('🚀 ~ fetchHtmlToJson ~ markdown:', markdown);
+    // Process images: Convert relative URLs to absolute ones
+    const base = new URL(url);
+    doc.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (src && !src.startsWith("http")) {
+        img.setAttribute("src", new URL(src, base).href);
+      }
+    });
 
-    console.log("====== 3. before extracting metadata =====");
-    // Step 3: Extract metadata manually using regex
-    const titleMatch = htmlText.match(/<title>([^<]*)<\/title>/i);
-    const langMatch = htmlText.match(/<html[^>]*lang="([^"]*)"[^>]*>/i);
-    console.log("====== 4. before constructing JSON result =====");
+    // Remove inline styles
+    doc.querySelectorAll("[style]").forEach((element) => {
+      element.removeAttribute("style");
+    });
 
+    // Remove unwanted elements
+    doc
+      .querySelectorAll("script, style, iframe, noscript, meta, head, footer")
+      .forEach((element) => {
+        element.remove();
+      });
+
+    // Convert the cleaned HTML to Markdown
+    const turndownService = new TurndownService();
+    const markdown = turndownService.turndown(doc.body.innerHTML);
+
+    // Collect metadata
+    const metadata = {
+      title: doc.querySelector("title")?.innerText || "",
+      language: doc.documentElement.lang || "en",
+      robots:
+        doc.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
+      ogTitle:
+        doc
+          .querySelector('meta[property="og:title"]')
+          ?.getAttribute("content") || "",
+      ogDescription:
+        doc
+          .querySelector('meta[property="og:description"]')
+          ?.getAttribute("content") || "",
+      ogImage:
+        doc
+          .querySelector('meta[property="og:image"]')
+          ?.getAttribute("content") || "",
+      ogLocaleAlternate:
+        Array.from(
+          doc.querySelectorAll('meta[property="og:locale:alternate"]')
+        ).map((el) => el.getAttribute("content")) || [],
+      sourceURL: url,
+    };
     const jsonResult = {
       success: true,
       data: {
         markdown,
-        metadata: {
-          title: titleMatch ? titleMatch[1] : "",
-          language: langMatch ? langMatch[1] : "en",
-          sourceURL: url,
-          statusCode: response.status,
-        },
+        metadata,
       },
     };
-    console.log("====== 5. returning JSON result =====");
+
     return jsonResult;
   } catch (error) {
-    console.error("Error fetching or parsing HTML:", error.stack);
-    return { success: false, error: error.message };
+    console.error("Error fetching or processing HTML:", error);
+    throw error; // Re-throw to handle it at the calling level
   }
-}
+};

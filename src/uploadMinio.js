@@ -52,6 +52,7 @@ export const uploadMinio = async (
       storeJobData(jobData);
       console.log("🚀 ~ jobData:", jobData);
       ethersConnect(jobData, checksum, checksumCreateTime, privateKey);
+      break;
     } catch (error) {
       retries++;
       console.error("Error uploading to MinIO:", error?.message, error);

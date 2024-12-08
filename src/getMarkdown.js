@@ -2,6 +2,15 @@ import { ethers } from "ethers";
 
 import { uploadMinio } from "./uploadMinio.js";
 
+const { convert } = require("html-to-markdown");
+const showdown = require("showdown");
+const cheerio = require("cheerio");
+
+// import fetchHtmlToMarkdown from "fetch-html-to-markdown";
+// import { fetchHtmlToJson } from "markdown-lite-worker";
+import TurndownService from "turndown";
+import getScrape from "./getScrape.js";
+
 function getLocalStorage(key) {
   return new Promise((resolve, reject) => {
     chrome.storage.local
@@ -23,7 +32,7 @@ const parseValue = (value) => {
 };
 
 const getMarkdown = async (value, privateKey) => {
-  // console.log("jobData", value?.data);
+  console.log("jobData", value?.data);
   const JobData = value?.data;
 
   // Ensure the Dataset is valid before parsing
@@ -73,13 +82,13 @@ const getMarkdown = async (value, privateKey) => {
   for (let i = 0; i < urls.length; i++) {
     console.log("response2", urls[i]);
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/hello?url=${urls[i]}`
-      );
+      // const response = await fetch(`next/server/api/hello?url=${urls[i]}`);
+      const response = await getScrape(urls[i]);
+
       console.log("response", response);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response?.success) {
+        const data = response;
         console.log("🚀 ~ fetchData ~ data:", data?.data?.markdown);
 
         const markdownData = JSON.stringify(data?.data?.markdown, null, 2);
@@ -103,6 +112,58 @@ const getMarkdown = async (value, privateKey) => {
     } catch (err) {
       console.error("Error fetching or uploading data:", err);
     }
+  }
+};
+
+const fetchHtmlToJson = async (url) => {
+  try {
+    const response = await fetch(url);
+    console.log("🚀 ~ handler ~ response:", response);
+    const htmlText = await response.text();
+    // console.log("🚀 ~ handler ~ htmlText:", htmlText);
+
+    // const markdown = convert(htmlText);
+
+    // const jsonResult = {
+    //   success: true,
+    //   data: {
+    //     markdown: markdown,
+    //     sourceURL: url,
+    //     statusCode: response.status,
+    //   },
+    // };
+    const $ = cheerio.load(htmlText); // Load the HTML into cheerio
+
+    const base = new URL(url); // Base URL for resolving relative URLs
+
+    // Normalize image URLs
+    $("img").each((index, img) => {
+      const src = $(img).attr("src");
+      if (src && !src.startsWith("http")) {
+        $(img).attr("src", new URL(src, base).href);
+      }
+    });
+
+    // Remove inline styles
+    $("[style]").removeAttr("style");
+
+    // Remove unwanted tags
+    $("script, style, iframe, noscript, meta, head, footer").remove();
+
+    // Get cleaned HTML
+    const cleanedHtml = $("body").html();
+    const converter = new showdown.Converter();
+
+    // Convert to Markdown (using TurndownService or similar)
+    console.log("cleanedHtml", converter.makeMarkdown(cleanedHtml));
+
+    const turndownService = new TurndownService();
+    const finalText = turndownService.turndown(cleanedHtml);
+    console.log(finalText, "finalText");
+
+    return jsonResult;
+  } catch (error) {
+    console.error("Error fetching or parsing HTML:", error);
   }
 };
 

@@ -44,17 +44,6 @@ const ImportWallet = () => {
     initialize();
   };
 
-  useEffect(() => {
-    window.postMessage({ type: "getExtensionID", value: "" }, "*");
-
-    window.addEventListener("message", (event) => {
-      if (event?.data?.type === "sendExtensionId") {
-        // localStorage.setItem("extensionID", event?.data?.value);
-        // setExtensionID(event?.data?.value);
-      }
-    });
-  }, []);
-
   const showToast = (msg) => {
     toast.error(msg, {
       position: "top-right",
@@ -73,43 +62,38 @@ const ImportWallet = () => {
     try {
       setLoading(true);
       const wallet = new ethers.Wallet(privateKeyValue);
-      const wsService = new WebSocket(process.env.NEXT_PUBLIC_WS_URL);
-      wsService.onopen = () => {
-        console.log("WebSocket is connected. in Wallet");
-        wsService?.send(
-          JSON.stringify({
-            workerID: `chrome-extension://${extensionID}`,
+      let extensionID = await getLocalStorage("extensionID");
+      chrome.runtime.sendMessage(
+        {
+          type: "send_websocket_message",
+          data: JSON.stringify({
+            workerID: `chrome-extension://${chrome?.runtime?.id}`,
             msgType: "REGISTER",
             message: {
               id: uuidv4(),
               type: "REGISTER",
               worker: {
-                host: `chrome-extension://${extensionID}`,
+                host: `chrome-extension://${chrome?.runtime?.id}`,
                 identity: extensionID,
                 ownerAddress: wallet?.address ?? "",
                 type: "Extension",
               },
             },
-          })
-        );
-      };
-
-      wsService.onmessage = async (value) => {
-        console.log("Received job message:", JSON?.parse(value?.data));
-        let message = JSON?.parse(value?.data);
-
-        if (message?.status === false) {
-          router?.push(`/register-failed?reason=${message?.message}`);
-        } else if (message?.status === true) {
-          const authToken = await getLocalStorage("auth_token");
-          if (!authToken) {
-            handleGenerateToken(wallet?.address);
+          }),
+        },
+        async (response) => {
+          console.log("Response:", response);
+          let message = JSON?.parse(response);
+          if (message?.status === false) {
+            router?.push(`/register-failed?reason=${message?.message}`);
+          } else if (message?.status === true) {
+            const authToken = await getLocalStorage("auth_token");
+            if (!authToken) {
+              handleGenerateToken(wallet?.address);
+            }
           }
         }
-      };
-      wsService.onerror = () => {
-        setLoading(false);
-      };
+      );
     } catch (error) {
       setLoading(false);
       console.error("Error during registration:", error);

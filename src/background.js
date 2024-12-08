@@ -2,11 +2,9 @@ import getMarkdown from "./getMarkdown";
 
 let socket = null;
 let reconnectTimeout = null;
-const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
 
-console.log("ENV URL", process.env.NEXT_PUBLIC_WS_URL);
-
-// const url = "ws://192.168.18.129:9999";
+const url = "ws://192.168.36.182:9999";
 
 chrome?.runtime.onInstalled.addListener(() => {
   console.log("Extension Installed");
@@ -22,26 +20,21 @@ export function connectWebSocket(url) {
 
     socket.onopen = () => {
       console.log("WebSocket is connected.");
-      socket.send(
-        JSON.stringify({ action: "connect", data: "Client connected" })
-      );
 
-      // Start sending heartbeat after WebSocket is connected
-      sendHeartbeat("Bossssss aee pls");
+      sendHeartbeat("HEARTBEAT SENT");
     };
 
     socket.onmessage = async (event) => {
       console.log("Message received from WebSocket:", event.data);
 
       const message = JSON.parse(event.data);
-      setTimeout(() => {
-        chrome.runtime.sendMessage(
-          { type: "send_jobdata", data: message },
-          (response) => {
-            console.log("Response from content script:", response);
-          }
-        );
-      }, 5000);
+
+      chrome.runtime.sendMessage(
+        { type: "send_jobdata", data: message },
+        (response) => {
+          console.log("Response from content script:", response);
+        }
+      );
 
       socket?.send(
         JSON.stringify({
@@ -57,9 +50,9 @@ export function connectWebSocket(url) {
       let privateKey = await getLocalStorage("privateKey");
       console.log("🚀 ~ socket.onmessage= ~ privateKey:", privateKey);
 
-      if (privateKey) {
-        await getMarkdown(message, privateKey);
-      }
+      // if (privateKey) {
+      await getMarkdown(message, privateKey);
+      // }
     };
 
     socket.onerror = (error) => {
@@ -97,19 +90,21 @@ export function connectWebSocket(url) {
   }
 }
 
-if (chrome.runtime && chrome.runtime.onMessage) {
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "send_privatekey") {
-      console.log("Received value:", request);
-      setLocalStorage("privateKey", request?.value);
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("receiveMesaage", message);
+  if (message.type === "send_websocket_message" && socket) {
+    socket.send(message.data);
+    socket.onmessage = async (event) => {
+      sendResponse(event?.data);
+    };
+  }
+  return true;
+});
 
-      // Send a response back to the content script if needed
-      sendResponse({ status: "Value received" });
-    }
-  });
-} else {
-  console.error("chrome.runtime.onMessage is not available.");
-}
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("receiveMesaage", message);
+  return true;
+});
 
 const parseValue = (value) => {
   try {
