@@ -2,9 +2,11 @@ import getMarkdown from "./getMarkdown";
 
 let socket = null;
 let reconnectTimeout = null;
-// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
 
-const url = "ws://192.168.36.182:9999";
+// const url = "ws://192.168.18.129:9999";
+
+const port = chrome.runtime.connect({ name: "myConnection" });
 
 chrome?.runtime.onInstalled.addListener(() => {
   console.log("Extension Installed");
@@ -28,13 +30,6 @@ export function connectWebSocket(url) {
       console.log("Message received from WebSocket:", event.data);
 
       const message = JSON.parse(event.data);
-
-      chrome.runtime.sendMessage(
-        { type: "send_jobdata", data: message },
-        (response) => {
-          console.log("Response from content script:", response);
-        }
-      );
 
       socket?.send(
         JSON.stringify({
@@ -94,15 +89,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("receiveMesaage", message);
   if (message.type === "send_websocket_message" && socket) {
     socket.send(message.data);
-    socket.onmessage = async (event) => {
+    socket.onmessage = (event) => {
       sendResponse(event?.data);
     };
   }
-  return true;
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("receiveMesaage", message);
   return true;
 });
 
@@ -132,13 +122,12 @@ function setLocalStorage(key, value) {
       .set({ [key]: JSON.stringify(value) })
       .then(() => {
         resolve();
-        chrome.runtime.sendMessage({
-          type: "storageUpdated",
-          key: key,
-          value: value,
-        });
         console.log("Data saved successfully to chrome storage", value);
       })
       .catch(reject);
   });
 }
+
+port.onMessage.addListener((response) => {
+  console.log("responsePrt", response);
+});
