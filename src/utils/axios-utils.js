@@ -53,10 +53,11 @@ appAxios.interceptors.response.use(
       // Remove the expired token from storage and redirect
       // localStorage.removeItem("auth_token");
       // localStorage.removeItem("privateKey");
-      clearLocalStorage();
+      //
 
       // Redirect user to login or welcome page
       Router.push("/welcome");
+      clearLocalStorage();
     } else if (statusCode === 500) {
       console.error("Server error (500).");
 

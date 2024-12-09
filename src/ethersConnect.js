@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 
-export const ethersConnect = async (
+export async function ethersConnect(
   jobData,
   checksum,
   checksumCreateTime,
   privateKey
-) => {
+) {
   console.log("uploadMInio Pgae", privateKey);
 
   // Ensure ethers is imported and available
@@ -142,6 +142,7 @@ export const ethersConnect = async (
         status: true,
         tx_requests: signedDataArray,
       };
+
       chrome.runtime.sendMessage(
         {
           type: "sent_completion",
@@ -162,9 +163,10 @@ export const ethersConnect = async (
     } else {
       console.warn("No valid data to send.");
     }
-    return jobWithSign;
   } catch (error) {
     console.error("Error in ethersConnect:", error);
     return null;
   }
-};
+}
+
+export default ethersConnect;

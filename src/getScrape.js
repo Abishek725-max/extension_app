@@ -63,6 +63,8 @@ export default async function getScrape(url) {
           return `### ${$(node).text()}\n`;
         case "p":
           return `${$(node).text()}\n`;
+        case "div":
+          return `${$(node).text()}\n`;
         case "ul":
           return (
             $(node)
@@ -77,20 +79,23 @@ export default async function getScrape(url) {
           return `[${$(node).text()}](${$(node).attr("href")})`;
         case "img":
           return `![${$(node).attr("alt")}](${$(node).attr("src")})`;
+
         default:
           return $(node).text() || "";
       }
     }
 
-    // Traverse the body and convert to markdown
-    let markdownContent = "";
-    $("body")
-      .children()
-      .each((i, el) => {
-        markdownContent += htmlToMarkdown(el);
-      });
-
     const cleanedHtml = $("body").html();
+
+    // Traverse the body and convert to markdown
+    // let markdownContent = "";
+    // $("body")
+    //   .children()
+    //   .each((i, el) => {
+    //     markdownContent += htmlToMarkdown(el);
+    //   });
+
+    console.log("markdownContent", convert(cleanedHtml));
 
     const jsonResult = {
       success: true,

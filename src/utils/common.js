@@ -141,11 +141,6 @@ export function setLocalStorage(key, value) {
       .set({ [key]: JSON.stringify(value) })
       .then(() => {
         resolve();
-        chrome.runtime.sendMessage({
-          type: "storageUpdated",
-          key: key,
-          value: value,
-        });
         console.log("Data saved successfully! in chrome storage", value);
       })
       .catch(reject);
