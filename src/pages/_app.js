@@ -12,21 +12,19 @@ import { useEffect } from "react";
 
 export default function App({ Component, pageProps }) {
   return (
-    <RainbowKitWallet>
-      <Providers>
-        <Component {...pageProps} />
-        <ToastContainer
-          position="top-right"
-          autoClose={15000}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </Providers>
-    </RainbowKitWallet>
+    <Providers>
+      <Component {...pageProps} />
+      <ToastContainer
+        position="top-right"
+        autoClose={15000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </Providers>
   );
 }

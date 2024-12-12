@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const formatWalletAddress = (walletAddress) => {
   if (walletAddress) {
     const firstPart = walletAddress.slice(0, 4); // First 4 characters
@@ -94,7 +96,26 @@ export const epochPointsWithHeight = (rewardsHistoryData, maxTotalPoint) => {
   });
   return newData;
 };
+const sortData = (data, order = "asc") => {
+  return data.sort((a, b) => {
+    const diff = dayjs(a.date).diff(dayjs(b.date));
+    return order === "asc" ? diff : -diff;
+  });
+};
 
+export const checkRealtimeEntry = (rewardsHistoryData) => {
+  if (rewardsHistoryData.length === 0) return null; // Return null if data is empty
+  const sortedDataVal = sortData(rewardsHistoryData, "desc");
+  // rewardsHistoryData.sort((a, b) =>
+  //   dayjs(a.date).diff(dayjs(b.date)),
+  // );
+  return sortedDataVal[0].date;
+  // return rewardsHistoryData.reduce((latest, current) => {
+  //   return new Date(current.created) > new Date(latest.created)
+  //     ? current
+  //     : latest;
+  // });
+};
 // Step 1: Find the most recent entry by comparing dates
 export const latestEntry = (rewardsHistoryData) => {
   if (rewardsHistoryData.length === 0) return null; // Return null if data is empty

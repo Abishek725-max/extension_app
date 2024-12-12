@@ -2,16 +2,6 @@
 
 console.log("content Script loaded");
 
-try {
-  console.log("Content Script Environment Check:", {
-    chromeRuntime: !!chrome.runtime,
-    documentReady: document.readyState,
-    url: window.location.href,
-  });
-} catch (error) {
-  console.error("Content Script Initialization Error:", error);
-}
-
 // Get GPU information using WebGL
 function sendGPUInfoToBackground() {
   try {

@@ -46,6 +46,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
   },
-  target: ["web", "es5"], // Broader compatibility
+  target: ["web"], // Broader compatibility
+  target: "web", // Broader compatibility
   devtool: "source-map",
 };

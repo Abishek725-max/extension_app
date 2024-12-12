@@ -1,5 +1,6 @@
 import { Slide, toast } from "react-toastify";
-import baseAxios from "./axios-utils";
+import baseAxios from "./base-axios";
+import rewardAxios from "./reward-axios";
 // console.log('🚀 ~ baseAxios:', baseAxios);
 
 export const generateToken = async (address) => {
@@ -23,7 +24,7 @@ export const generateToken = async (address) => {
 
 export const claimReward = async () => {
   try {
-    const response = await baseAxios.put("/users/reward_permit");
+    const response = await rewardAxios.put("/claim_reward");
     console.log("🚀 ~ claimReward ~ response:", response);
     return response.data;
   } catch (error) {
@@ -32,9 +33,19 @@ export const claimReward = async () => {
   }
 };
 
+export const getUser = async () => {
+  try {
+    const response = await baseAxios.get("/users/me");
+    return response.data;
+  } catch (error) {
+    console.error("Error reward Total:", error);
+    throw error;
+  }
+};
+
 export const getRewardsHistory = async () => {
   try {
-    const response = await baseAxios.get("/users/reward_history");
+    const response = await rewardAxios.get("/reward_history");
     return response.data;
   } catch (error) {
     console.error("Error reward_history:", error);
@@ -44,7 +55,7 @@ export const getRewardsHistory = async () => {
 
 export const getRewardsRealTime = async () => {
   try {
-    const response = await baseAxios.get("/users/reward_realtime");
+    const response = await rewardAxios.get("/reward_realtime");
     return response.data;
   } catch (error) {
     console.error("Error reward_realtime:", error);
@@ -54,7 +65,7 @@ export const getRewardsRealTime = async () => {
 
 export const getRewardsTotal = async () => {
   try {
-    const response = await baseAxios.get("/users/reward");
+    const response = await rewardAxios.get("/reward");
 
     return response.data;
   } catch (error) {
@@ -65,7 +76,7 @@ export const getRewardsTotal = async () => {
 
 export const getDailyRewardStatus = async () => {
   try {
-    const response = await baseAxios.get("/users/reward_permit_status");
+    const response = await rewardAxios.get("/claim_details");
     return response.data;
   } catch (error) {
     console.log("Error reward Total:", error);
@@ -80,5 +91,22 @@ export const getDailyRewardStatus = async () => {
       theme: "colored",
       transition: Slide,
     });
+  }
+};
+export const nonceApi = async () => {
+  try {
+    const response = await baseAxios.get("/auth/nonce");
+    return response.data;
+  } catch (error) {
+    console.log("Error reward Total:", error);
+  }
+};
+
+export const loginDataApi = async () => {
+  try {
+    const response = await baseAxios.get("/auth/login");
+    return response.data;
+  } catch (error) {
+    console.log("Error reward Total:", error);
   }
 };

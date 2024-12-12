@@ -1,18 +1,20 @@
 import * as tf from "@tensorflow/tfjs";
 let socket = null;
 let reconnectTimeout = null;
-// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
-const url = "ws://192.168.18.129:9999";
+const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+// const url = "ws://192.168.18.129:9999";
 import { ethers } from "ethers";
-import { PutObjectCommand, S3Client, s3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Buffer } from "buffer";
 import SHA256 from "crypto-js/sha256";
 import TurndownService from "turndown";
 import getScrape from "./getScrape.js";
+import { headers } from "next/headers.js";
+import { hashAuthorization } from "viem/experimental";
 
 chrome?.runtime.onInstalled.addListener(() => {
   console.log("Extension Installed");
-  connectWebSocket(url);
+  // connectWebSocket(url);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -25,22 +27,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
     return true;
   }
-  return true;
+  if (message.type === "connect_socket") {
+    console.log("receivedWebSocket", message);
+    connectWebSocket(url, message?.data?.authToken);
+    sendResponse("successfullt");
+  }
+  // return true;
 });
 
-connectWebSocket(url);
+// connectWebSocket(url);
 
-export function connectWebSocket(url) {
+export function connectWebSocket(url, authToken) {
   // Function to handle WebSocket connection
+
   function createWebSocket() {
-    socket = new WebSocket(url);
+    console.log("urllll", url, authToken);
+    const wsUrl = `${url}?authToken:${authToken}`;
+    socket = new WebSocket(wsUrl);
 
     socket.onopen = async () => {
       console.log("WebSocket is connected.");
       setInterval(async () => {
         let privateKey = await getLocalStorage("privateKey");
         privateKey && sendHeartbeat("HEARTBEAT SENT");
-      }, 10000);
+      }, 30000);
     };
 
     socket.onmessage = async (event) => {
@@ -375,9 +385,9 @@ async function ethersConnect(
   console.log("uploadMInio Pgae", privateKey);
 
   // Ensure ethers is imported and available
-  if (!ethers || !ethers.utils) {
+  if (!ethers) {
     console.error(
-      "ethers.utils is undefined. Make sure ethers is imported correctly."
+      "ethers is undefined. Make sure ethers is imported correctly."
     );
     return;
   }
@@ -431,13 +441,13 @@ async function ethersConnect(
 
   try {
     // Check if `solidityKeccak256` is available before calling
-    if (!ethers.utils.solidityKeccak256) {
+    if (!ethers.solidityPackedKeccak256) {
       console.error("solidityKeccak256 method is unavailable.");
       return;
     }
 
     // Call `solidityKeccak256` with the correct types
-    let hash = ethers.utils.solidityKeccak256(
+    let hash = ethers.solidityPackedKeccak256(
       [
         "string", // worker
         "string", // dataNetAddress
@@ -460,7 +470,7 @@ async function ethersConnect(
     }
 
     // Sign the message with the wallet's private key
-    let signature = await wallet.signMessage(ethers.utils.arrayify(hash));
+    let signature = await wallet.signMessage(ethers.getBytes(hash));
     console.log("🚀 ~ ethersConnect ~ signature:", signature);
 
     const jobWithSign = {

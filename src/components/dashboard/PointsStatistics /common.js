@@ -87,18 +87,83 @@ const epochPoints = [
 export const calculatePercentage = (value, total) => (value / total) * 10;
 
 // Step 1: Find the maximum total value
-export const maxTotal = (data, realTimeData) => {
-  let MaxTotalData = Math.max(...data.map((point) => point?.agg_points));
-  return realTimeData.total > MaxTotalData ? realTimeData.total : MaxTotalData;
+export const maxTotal = (data) => {
+  return Math.max(...data.map((point) => point?.total_points));
 };
 
 // Step 2: Calculate rem values based on the ratio to the maximum total
-export const epochPointsWithHeight = (data, maximumTotal) => {
+export const epochPointsWithHeight = (
+  data,
+  maximumTotal,
+  realTimeData,
+  rewardsRealTimeDataArray,
+  checkRealtimeDateinHistory
+) => {
+  const found = rewardsRealTimeDataArray?.find((item) =>
+    dayjs(item.date).isSame(dayjs(checkRealtimeDateinHistory), "day")
+  );
+
+  const todayHeartBeats = {
+    date: rewardsRealTimeDataArray[0]?.date,
+    details: [
+      {
+        claim_type: 3,
+        points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
+      },
+    ],
+    total_points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
+  };
+  if (!found) {
+    data?.push(todayHeartBeats);
+  }
   const newData = data.map((point) => {
-    const chartHeight = (point.agg_points / maximumTotal) * 10;
+    const chartHeight = (point.total_points / maximumTotal) * 10;
+    const total_points =
+      rewardsRealTimeDataArray[0]?.date === point?.date
+        ? point.total_points +
+          Number(rewardsRealTimeDataArray[0]?.total_heartbeats)
+        : point.total_points;
+    const claimMining = point?.details?.find((e) => e.claim_type === 3);
+    if (rewardsRealTimeDataArray[0]?.date === point?.date) {
+      if (Number(rewardsRealTimeDataArray[0]?.total_heartbeats) > 0) {
+        if (claimMining === undefined) {
+          point.details.push({
+            claim_type: 3,
+            points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
+          });
+        } else {
+          claimMining.points = Number(
+            rewardsRealTimeDataArray[0]?.total_heartbeats
+          );
+        }
+      }
+    }
+
+    const detailsGet = point.details.map((pointDetail) => {
+      return {
+        ...pointDetail,
+        reward_type:
+          pointDetail.claim_type == 1
+            ? "referral"
+            : pointDetail.claim_type == 2
+            ? "mission"
+            : pointDetail.claim_type == 3
+            ? "mining"
+            : pointDetail.claim_type == 4
+            ? "tier"
+            : pointDetail.claim_type == 5
+            ? "bonus"
+            : "",
+      };
+    });
+    const details = detailsGet.sort((a, b) => a.claim_type - b.claim_type);
     return {
       ...point,
-      chartHeight: `${chartHeight}rem`, // Add the calculated rem value to the object
+      total_points,
+      details,
+      chartHeight: `${
+        Math.floor(chartHeight) > 0 ? chartHeight : chartHeight + 0.4
+      }rem`, // Add the calculated rem value to the object
     };
   });
   return newData;
@@ -120,6 +185,8 @@ export const realTimeDataHeightCalc = (realTimeData, maximumTotal) => {
 
   return {
     ...realTimeData,
-    chartHeight: `${chartHeight}rem`, // Add the calculated rem value to the object
+    chartHeight: `${
+      Math.floor(chartHeight) > 0 ? chartHeight : chartHeight + 0.4
+    }rem`, // Add the calculated rem value to the object
   };
 };

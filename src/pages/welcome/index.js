@@ -14,7 +14,7 @@ import {
 import { getDataWithId } from "@/utils/indexed-db";
 import { getLocalStorage, setLocalStorage } from "@/utils/common";
 
-const Home = () => {
+const Welcome = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +31,11 @@ const Home = () => {
       if (result) {
         router?.push(`/home`);
       } else {
-        router?.push("/choose-wallet");
+        // router?.push("/web-login");
+        const url = `chrome-extension://${chrome.runtime.id}/web-login.html`;
+
+        // Open the URL in a new tab
+        chrome.tabs.create({ url: url });
       }
     }, 3000);
   };
@@ -54,4 +58,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Welcome;

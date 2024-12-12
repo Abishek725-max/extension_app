@@ -1,10 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "My Chrome Extension",
+  "name": "OpenLedger LiteWorker",
   "version": "1.0",
   "description": "A demo Chrome extension to run scripts in extension context.",
   "background": {
     "service_worker": "background.bundle.js"
+  },
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   },
 
   "minimum_chrome_version": "88",
@@ -16,18 +22,21 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.bundle.js"],
-      "run_at": "document_end"
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [
     {
       "matches": ["<all_urls>"],
-      "resources": ["build.js"]
+      "resources": ["index.html"]
     }
   ],
+
   "externally_connectable": {
     "matches": ["<all_urls>"]
   },
+
   "offline_enabled": true,
 
   "action": {
@@ -43,9 +52,18 @@
     "webNavigation",
     "clipboardWrite",
     "system.memory",
-    "memory",
-    "system"
+    "system",
+    "webRequest"
   ],
 
-  "host_permissions": ["http://*/*", "https://*/*"]
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*",
+    "*://*/*",
+    "https://*.web3auth.io/*",
+    "https://rpc.ankr.com/*",
+    "https://api.infura.io/*",
+    "https://api.web3auth.io/*",
+    "https://accounts.google.com/*"
+  ]
 }

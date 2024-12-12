@@ -11,8 +11,9 @@ import {
   maxTotal,
   realTimeDataHeightCalc,
 } from "./common";
+import { checkRealtimeEntry } from "@/utils/common";
 
-const BarChart = ({ type, barValue, total }) => {
+const BarChart = ({ type, barValue, total = 0 }) => {
   return (
     <>
       {barValue !== undefined &&
@@ -31,7 +32,7 @@ const BarChart = ({ type, barValue, total }) => {
   );
 };
 
-const PointsStatistics = ({ data, realTimeData }) => {
+const PointsStatistics = ({ data, realTimeData, rewardsRealTimeDataArray }) => {
   const scrollRef = useRef(null);
   useEffect(() => {
     if (scrollRef.current) {
@@ -48,14 +49,21 @@ const PointsStatistics = ({ data, realTimeData }) => {
   // useEffect(() => {
   //   setGetLatestEntry(latestEntry(data));
   // }, [data]);
-  const getMaxTotal = maxTotal(data, realTimeData);
-  const pointsHeightData = epochPointsWithHeight(data, getMaxTotal);
+  const getMaxTotal = maxTotal(data);
+  const checkRealtimeDateinHistory = checkRealtimeEntry(data);
+  const pointsHeightData = epochPointsWithHeight(
+    data,
+    getMaxTotal,
+    realTimeData,
+    rewardsRealTimeDataArray,
+    checkRealtimeDateinHistory
+  );
   const pointsHeight = pointsHeightData.sort((a, b) =>
     dayjs(a.date).diff(dayjs(b.date))
   );
   const getLatestEntry = latestEntry(data);
   // Realtime data function for chart
-  const realTimeDataHeight = realTimeDataHeightCalc(realTimeData, getMaxTotal);
+  // const realTimeDataHeight = realTimeDataHeightCalc(realTimeData, getMaxTotal);
 
   const generateEntries = (dateString, dataLength) => {
     const today = new Date();
@@ -83,10 +91,10 @@ const PointsStatistics = ({ data, realTimeData }) => {
     return entries;
   };
 
-  const generateEntryDate =
-    data.length > 0 ? getLatestEntry : realTimeData.date;
+  // const generateEntryDate =
+  //   data.length > 0 ? getLatestEntry : realTimeData.date;
 
-  const entries = generateEntries(generateEntryDate, data.length);
+  const entries = generateEntries(getLatestEntry, data?.length);
 
   return (
     <div className="statiticschart-card border border-[#E7E7E9] dark:border-[#3E3E3E] h-full flex flex-col justify-between">
@@ -95,7 +103,7 @@ const PointsStatistics = ({ data, realTimeData }) => {
           Earnings Statistics
         </h2>
       </div>
-      {realTimeDataHeight ? (
+      {data?.length > 0 ? (
         <>
           <div className="chart-box" ref={scrollRef}>
             <div className="flex flex-row-reverse gap-[1rem]">
@@ -136,24 +144,54 @@ const PointsStatistics = ({ data, realTimeData }) => {
                             {dayjs(items.date).format("MMM D")}
                           </h6>
                           <ul>
+                            {items?.details &&
+                              items?.details.map((pointDetail, index) => {
+                                return (
+                                  <li key={index}>
+                                    <span>
+                                      <i
+                                        className="dotBox"
+                                        style={{
+                                          backgroundColor:
+                                            pointDetail.claim_type == 1
+                                              ? "#12b9d7"
+                                              : pointDetail.claim_type == 2
+                                              ? "#ffe889"
+                                              : pointDetail.claim_type == 3
+                                              ? "#fb6340"
+                                              : pointDetail.claim_type == 4
+                                              ? "#fb6340"
+                                              : pointDetail.claim_type == 5
+                                              ? "#76e8b7"
+                                              : "",
+                                        }}
+                                      ></i>{" "}
+                                      {pointDetail.reward_type
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                        pointDetail.reward_type.slice(1)}{" "}
+                                      :
+                                    </span>{" "}
+                                    <span>
+                                      {pointDetail?.points
+                                        ? pointDetail?.points
+                                        : 0}
+                                    </span>
+                                  </li>
+                                );
+                              })}
                             <li>
-                              <span>Heart Beat :</span>{" "}
                               <span>
-                                {items?.details?.heartbeat
-                                  ? items?.details?.heartbeat
-                                  : 0}
-                              </span>
-                            </li>
-                            <li>
-                              <span>Referral :</span>{" "}
-                              <span>
-                                {items?.details?.referral
-                                  ? items?.details?.referral
-                                  : 0}
-                              </span>
-                            </li>
-                            <li>
-                              <span>Total :</span> <span>{items?.points}</span>
+                                {" "}
+                                <i
+                                  className="dotBox"
+                                  style={{
+                                    backgroundColor: " #b5b5b5",
+                                  }}
+                                ></i>
+                                Total :
+                              </span>{" "}
+                              <span>{items?.total_points}</span>
                             </li>
                           </ul>
                         </div>
@@ -163,7 +201,7 @@ const PointsStatistics = ({ data, realTimeData }) => {
                     >
                       <div className={`chart-view`} key={index}>
                         <h6 className="txt-bx bg-[#1b1b1d] text-[#f2f3f9] dark:bg-white dark:text-[#161618]">
-                          {items?.points}
+                          {items?.total_points}
                         </h6>
 
                         <div
@@ -172,16 +210,38 @@ const PointsStatistics = ({ data, realTimeData }) => {
                             height: `${items.chartHeight}`,
                           }}
                         >
-                          <BarChart
-                            type="heartbest"
-                            barValue={items?.details?.heartbeat}
-                            total={items?.points}
-                          />
-                          <BarChart
-                            type="referral"
-                            barValue={items?.details?.referral}
-                            total={items?.points}
-                          />
+                          {items?.details &&
+                            items?.details.map((pointDetail, index) => {
+                              return (
+                                <BarChart
+                                  type={pointDetail.reward_type}
+                                  barValue={pointDetail?.points}
+                                  total={items?.total_points}
+                                  key={index}
+                                />
+                              );
+                            })}
+                          {items?.details?.heartbeat && (
+                            <BarChart
+                              type="heartbest"
+                              barValue={items?.details?.heartbeat}
+                              total={items?.points}
+                            />
+                          )}
+                          {items?.details?.referral && (
+                            <BarChart
+                              type="referral"
+                              barValue={items?.details?.referral}
+                              total={items?.points}
+                            />
+                          )}
+                          {items?.details?.bonus && (
+                            <BarChart
+                              type="bonus"
+                              barValue={items?.details?.bonus}
+                              total={items?.details?.total}
+                            />
+                          )}
                         </div>
                         <h6 className="date text-[#68686F] dark:text-[#9F9FA5]">
                           {dayjs(items.date).format("MMM D")}
@@ -191,92 +251,6 @@ const PointsStatistics = ({ data, realTimeData }) => {
                   );
                 })}
               </div>
-            )}
-            {realTimeDataHeight && (
-              <>
-                <Tippy
-                  interactive={true}
-                  interactiveBorder={20}
-                  delay={100}
-                  content={
-                    <div className="tooltip-info-statitics">
-                      <h6 className="date">
-                        {dayjs(realTimeDataHeight.date).format("MMM D")}
-                      </h6>
-                      <ul>
-                        {realTimeDataHeight?.total_heartbeats && (
-                          <li>
-                            <span>Heart Beat :</span>{" "}
-                            <span>{realTimeDataHeight?.total_heartbeats}</span>
-                          </li>
-                        )}
-                        {realTimeDataHeight?.referral && (
-                          <li>
-                            <span>Referral :</span>{" "}
-                            <span>{realTimeDataHeight?.referral}</span>
-                          </li>
-                        )}
-                        {realTimeDataHeight?.bonus && (
-                          <li>
-                            <span>Bonus :</span>{" "}
-                            <span>{realTimeDataHeight?.bonus}</span>
-                          </li>
-                        )}
-                        {realTimeDataHeight?.total && (
-                          <li>
-                            <span>Total :</span>{" "}
-                            <span>{realTimeDataHeight?.total}</span>
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  }
-                  placement="right"
-                  key={`key_${realTimeDataHeight?.total}`}
-                >
-                  <div
-                    className={`chart-view latest-chart`}
-                    key={realTimeDataHeight?.total}
-                  >
-                    <h6 className="txt-bx bg-[#1b1b1d] text-[#f2f3f9] dark:bg-white dark:text-[#161618]">
-                      {realTimeDataHeight?.total}
-                    </h6>
-
-                    <div
-                      className="chart-card"
-                      style={{
-                        height: `${realTimeDataHeight.chartHeight}`,
-                      }}
-                    >
-                      {realTimeDataHeight?.total_heartbeats && (
-                        <BarChart
-                          type="heartbest"
-                          barValue={realTimeDataHeight?.total_heartbeats}
-                          total={realTimeDataHeight?.total}
-                        />
-                      )}
-
-                      {realTimeDataHeight?.referral && (
-                        <BarChart
-                          type="referral"
-                          barValue={realTimeDataHeight?.referral}
-                          total={realTimeDataHeight?.total}
-                        />
-                      )}
-                      {realTimeDataHeight?.bonus && (
-                        <BarChart
-                          type="bonus"
-                          barValue={realTimeDataHeight?.bonus}
-                          total={realTimeDataHeight?.total}
-                        />
-                      )}
-                    </div>
-                    <h6 className="date text-[#68686F] dark:text-[#9F9FA5]">
-                      {dayjs(realTimeDataHeight?.date).format("MMM D")}
-                    </h6>
-                  </div>
-                </Tippy>
-              </>
             )}
           </div>
         </>

@@ -2,6 +2,7 @@ import { claimReward, getDailyRewardStatus } from "@/utils/base-methods";
 import { useEffect, useState } from "react";
 import rewardBg from "../../assets/images/reward-bg.png";
 import Star from "../../assets/images/star.png";
+import rewardsGif from "../../assets/rewards.gif";
 import TimeCounter from "../time-counter";
 import {
   Image,
@@ -16,7 +17,7 @@ import {
 import Countdown from "react-countdown";
 import dayjs from "dayjs";
 
-const ClaimRewards = () => {
+const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loadingcanClaim, setLoadingcanClaim] = useState(false);
   const [canClaim, setCanClaim] = useState(true);
@@ -25,11 +26,14 @@ const ClaimRewards = () => {
   const [dailyRewardDataStatus, setDailyRewardDataStatus] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [nextClaimDateAtMidnight, setNextClaimDateAtMidnight] = useState(null);
+  const [claimStatus, setClaimStatus] = useState(null);
 
   useEffect(() => {
-    handlegetDailyRewardStatus();
-    checkClaimStatus();
-  }, []);
+    if (authToken) {
+      handlegetDailyRewardStatus();
+      // checkClaimStatus();
+    }
+  }, [authToken]);
 
   const checkClaimStatus = async () => {
     const storedDate = localStorage?.getItem("claimDateTime");
@@ -69,7 +73,7 @@ const ClaimRewards = () => {
 
       const rewardResponse = await claimReward();
       console.log("🚀 ~ handleClaim ~ rewardResponse:", rewardResponse);
-      isOpen();
+      // isOpen();
 
       setCanClaim(false);
       setLoadingcanClaim(false);
@@ -81,15 +85,27 @@ const ClaimRewards = () => {
     }
   };
 
+  const handleGetClaimReward = async () => {
+    setLoadingcanClaim(true);
+    try {
+      const response = await claimReward();
+      if (response) {
+        setClaimStatus(response?.data);
+        setLoadingcanClaim(false);
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.error("handleGetClaimRewardStatus:", error);
+      // showToast(error?.message, "error");
+      setLoadingcanClaim(false);
+    }
+  };
+
   const handlegetDailyRewardStatus = async () => {
     try {
       const response = await getDailyRewardStatus();
       if (response) {
-        setNextClaimDateAtMidnight(
-          calculateNextClaimTimeAtMidnight(response?.timestamp)
-        );
-
-        setDailyRewardDataStatus(response);
+        setClaimStatus(response.data);
       }
     } catch (error) {
       console.log("🚀 ~ handlegetDailyRewardStatus ~ error:", error);
@@ -103,18 +119,18 @@ const ClaimRewards = () => {
   const hideModal = () => {
     setIsModalVisible(false);
   };
-  function calculateNextClaimTimeAtMidnight(timestamp) {
-    if (!timestamp) {
-      throw new Error(
-        "Timestamp is required to calculate the next claim time."
-      );
-    }
-    const lastClaimDate = new Date(timestamp);
-    const nextClaimDate = new Date(lastClaimDate);
-    nextClaimDate.setDate(lastClaimDate.getDate() + 1); // Add one day
-    nextClaimDate.setHours(0, 0, 0, 0); // Set time to midnight
-    return nextClaimDate;
-  }
+  // function calculateNextClaimTimeAtMidnight(timestamp) {
+  //   if (!timestamp) {
+  //     throw new Error(
+  //       "Timestamp is required to calculate the next claim time."
+  //     );
+  //   }
+  //   const lastClaimDate = new Date(timestamp);
+  //   const nextClaimDate = new Date(lastClaimDate);
+  //   nextClaimDate.setDate(lastClaimDate.getDate() + 1); // Add one day
+  //   nextClaimDate.setHours(0, 0, 0, 0); // Set time to midnight
+  //   return nextClaimDate;
+  // }
 
   return (
     <>
@@ -136,31 +152,19 @@ const ClaimRewards = () => {
                 </h4>
               </div>
               <div className="flex flex-col gap-2 lg:gap-3 mt-8 sm:mt-6">
-                {dailyRewardDataStatus?.message &&
-                dailyRewardDataStatus?.status === 404 ? (
-                  <p className="text-md	text-[#68686F] leading-4 m-0 mb-2 font-medium  capitalize">
-                    {/* {dailyRewardDataStatus?.message} text-[#ff1744]*/}
-                    Claim your daily earnings
-                  </p>
-                ) : !dailyRewardDataStatus?.data?.permit ? (
+                {claimStatus?.claimed ? (
+                  <span className="block text-sm	text-[#68686F] leading-4 m-0 mb-2 font-bold">
+                    {/* Next Claim in:{" "} */}
+                    <TimeCounter targetDate={nextClaimDateAtMidnight} />
+                    {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
+                  </span>
+                ) : (
                   <>
                     <span className="block text-md	text-[#68686F] leading-4 m-0 mb-2 font-bold">
-                      Claim your daily earnings{" "}
+                      Claim Your Daily Rewards
                       {dailyRewardDataStatus?.data?.permit}
                     </span>
                   </>
-                ) : (
-                  dailyRewardDataStatus?.data?.permit && (
-                    <span className="block text-sm	text-[#68686F] leading-4 m-0 mb-2 font-bold">
-                      {/* Next Claim in:{" "} */}
-                      <TimeCounter targetDate={nextClaimDateAtMidnight} />
-                      {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
-                      {console.log(
-                        "nextClaimDateAtMidnight",
-                        nextClaimDateAtMidnight
-                      )}
-                    </span>
-                  )
                 )}
               </div>
             </div>
@@ -170,57 +174,57 @@ const ClaimRewards = () => {
                 alt="seasonEarnBg"
                 className="w-full h-auto max-w-[5.5rem] sm:max-w-[6rem] md:max-w-[8.5rem] lg:max-w-[9.5rem] xl:max-w-[11rem] xxl:max-w-[6.5rem] object-contain"
               />
-              {dailyRewardDataStatus?.message ? (
-                <Button color="primary" onClick={handleClaim}>
-                  Claim
+              {loadingcanClaim ? (
+                <Button color="primary" disabled onClick={handleGetClaimReward}>
+                  Loading
                 </Button>
               ) : (
-                <>
-                  {dailyRewardDataStatus?.data?.permit ? (
-                    <Button color="primary" onClick={handleClaim}>
-                      Claim
-                    </Button>
-                  ) : (
-                    !dailyRewardDataStatus?.data?.permit && (
-                      <Button color="default" isDisabled>
-                        Claimed
-                      </Button>
-                    )
-                  )}
-                </>
+                <Button
+                  color="primary"
+                  disabled={claimStatus?.claimed}
+                  onClick={handleGetClaimReward}
+                >
+                  {claimStatus?.claimed ? "Claimed" : "claim"}
+                </Button>
               )}
             </div>
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        onClose={hideModal}
+        isOpen={isModalVisible}
+        onOpenChange={onOpenChange}
+      >
         <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Daily Earnings
-              </ModalHeader>
-              <ModalBody>
-                <div className="flex flex-col gap-4 items-center justify-center">
-                  <Image
-                    alt="success"
-                    src={rewardsGif.src}
-                    className="dark:invert invert-0 dark:mix-blend-color-dodge"
-                  />
-                  <p>
-                    {" "}
-                    You&apos;ve Successfully claimed. Keep the app running to
-                    earn more rewards!
-                  </p>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onPress={onClose}>
-                  Done
-                </Button>
-              </ModalFooter>
-            </>
-          )}
+          <ModalHeader className="flex flex-col gap-1">
+            Daily Earnings
+          </ModalHeader>
+          <ModalBody>
+            <div className="flex flex-col gap-4 items-center justify-center">
+              <Image
+                alt="success"
+                src={rewardsGif.src}
+                className="dark:invert invert-0 dark:mix-blend-color-dodge"
+              />
+              <p>
+                {" "}
+                You&apos;ve Successfully claimed. Keep the app running to earn
+                more rewards!
+              </p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              onPress={() => {
+                hideModal();
+                handleGetRewardRealtime();
+              }}
+            >
+              Done
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
