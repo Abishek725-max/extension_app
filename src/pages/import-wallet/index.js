@@ -76,7 +76,7 @@ const ImportWallet = () => {
                 host: `chrome-extension://${chrome?.runtime?.id}`,
                 identity: extensionID,
                 ownerAddress: wallet?.address ?? "",
-                type: "Extension",
+                type: "LWEXT",
               },
             },
           }),

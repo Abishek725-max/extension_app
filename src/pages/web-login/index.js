@@ -26,6 +26,9 @@ import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { CHAIN_NAMESPACES, IProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { web3auth } from "@/utils/wallet-connect";
+import { ethers } from "ethers";
+import { generateToken } from "@/utils/base-methods";
+import { Slide, toast } from "react-toastify";
 
 const WebLogin = () => {
   const router = useRouter();
@@ -136,19 +139,21 @@ const WebLogin = () => {
 
       // Get user info
       const user = await web3auth.getUserInfo();
+      setLoading(true);
       setLocalStorage("userInfo", JSON.stringify(user));
 
       if (web3authProvider) {
         const privateKey = await getPrivateKey(web3authProvider);
+        initialize(privateKey);
         console.log("privateKey", privateKey);
         if (validatePrivateKey(privateKey)) {
           setLocalStorage("privateKey", privateKey);
           console.log("Private Key retrieved successfully");
-          setLoading(true);
-          setTimeout(() => {
-            router.push("/home");
-            setLoading(false);
-          }, 2000);
+
+          // setTimeout(() => {
+          //   router.push("/home");
+          //   setLoading(false);
+          // }, 2000);
         } else {
           throw new Error("Invalid Private Key Format");
         }
@@ -174,8 +179,47 @@ const WebLogin = () => {
     }
   };
 
+  const initialize = async (privateKey) => {
+    try {
+      const wallet = new ethers.Wallet(privateKey);
+      handleGenerateToken(wallet?.address);
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
+  };
+
+  const handleGenerateToken = async (address) => {
+    try {
+      console.log("address", address);
+      const tokenData = await generateToken(address);
+      setLocalStorage("auth_token", tokenData.data.token);
+      router?.push("/home");
+      setLoading(false);
+    } catch (error) {
+      handleLogout();
+      // router?.push(`/register-failed?reason=unable to connect genarate token`);
+      toast.error("unable to connect genarate token", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
+      setLoading(false);
+      console.error("Failed to generate token", error);
+    }
+  };
+
   const handleLogout = async () => {
     await web3auth.logout();
+  };
+
+  const openWebsite = () => {
+    chrome.tabs.create({ url: "https://devnet.openledger.dev/dashboard" });
   };
 
   // const clientId =
@@ -253,7 +297,9 @@ const WebLogin = () => {
                   />
                 </div>
                 <div className="content flex flex-col">
-                  <h1>Your Node setup is only a few minutes away</h1>
+                  <h2 className="text-xl font-bold">
+                    Your Node setup is only a few minutes away
+                  </h2>
                   <button
                     onClick={handleweb3Auth}
                     type="button"
@@ -344,12 +390,16 @@ const WebLogin = () => {
                     </div>
                     <div className="flex flex-col w-full">
                       <button
+                        onClick={() => openWebsite()}
                         type="button"
                         className="flex w-full justify-center items-center gap-2 rounded-lg bg-[#FF6600] border border-[#FF6600] p-3 text-base font-bold text-white"
                       >
                         Open Browser
                       </button>
-                      <p className="mt-2 m-0 text-center underline text-xs text-[#82838A]">
+                      <p
+                        className="mt-2 m-0 text-center underline text-xs text-[#82838A]"
+                        onClick={() => setIsModalVisible(false)}
+                      >
                         Sorry, Not Now.
                       </p>
                     </div>

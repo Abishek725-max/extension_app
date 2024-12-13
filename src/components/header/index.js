@@ -1,19 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../../assets/images/logo.png";
 import Profile from "../../assets/images/profile.png";
 import { Image } from "@nextui-org/react";
 
 import { useRouter } from "next/router";
+import { getLocalStorage } from "@/utils/common";
 
-const Header = ({ setHomepage = () => {} }) => {
+const Header = () => {
   const router = useRouter();
+  const [userInfo, setUserInfo] = useState();
 
-  const handle = async () => {
-    router.push("/wallet-details");
+  const handle = () => {
+    window.history.pushState({}, "", "/wallet-details.html");
+    window.location.reload();
+    // router.push("/wallet-details");
     // setHomepage();
   };
+
+  useEffect(async () => {
+    const userInfo = await getLocalStorage("userInfo");
+    setUserInfo(JSON.parse(userInfo));
+  }, []);
 
   return (
     <header className="p-4">
@@ -26,7 +35,7 @@ const Header = ({ setHomepage = () => {} }) => {
             <div className="profile cursor-pointer" onClick={handle}>
               <Image
                 alt="logo"
-                src={Profile.src}
+                src={userInfo?.profileImage}
                 className="h-8 w-8 object-contain"
               />
             </div>

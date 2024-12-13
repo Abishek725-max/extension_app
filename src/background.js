@@ -2,7 +2,7 @@ import * as tf from "@tensorflow/tfjs";
 let socket = null;
 let reconnectTimeout = null;
 const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
-// const url = "ws://192.168.18.129:9999";
+// const url = "ws://192.168.18.89:8888/ws/v1/orch";
 import { ethers } from "ethers";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Buffer } from "buffer";
@@ -130,17 +130,19 @@ export function connectWebSocket(url, authToken) {
       // Get GPU info by sending a message to the content script
 
       const heartbeatMessage = {
-        Worker: {
-          Identity: extensionId,
-          Address: wallet?.address,
-          Type: "HEARTBEAT",
-          Host: `chrome-extension://${extensionId}`,
-        },
-        Capacity: {
-          AvailableMemory: memoryInfo?.availableMemoryPercentage,
-          AvailableStorage: await getAvailableStoragePercentage(),
-          AvailableGPU: "",
-          AvailableModels: models ? Object.keys(models) : [],
+        message: {
+          Worker: {
+            Identity: extensionId,
+            ownerAddress: wallet?.address,
+            type: "LWEXT",
+            Host: `chrome-extension://${extensionId}`,
+          },
+          Capacity: {
+            AvailableMemory: memoryInfo?.availableMemoryPercentage,
+            AvailableStorage: await getAvailableStoragePercentage(),
+            AvailableGPU: "",
+            AvailableModels: models ? Object.keys(models) : [],
+          },
         },
         msgType: "HEARTBEAT",
         workerID: extensionId,
@@ -314,7 +316,7 @@ async function uploadMinio(
     tls: true,
     maxAttempts: 3,
     requestHandlerOptions: {
-      timeout: 30000,
+      timeout: 10000,
     },
   });
   const bodyBuffer = Buffer.from(data, "utf-8");

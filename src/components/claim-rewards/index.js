@@ -1,6 +1,6 @@
 import { claimReward, getDailyRewardStatus } from "@/utils/base-methods";
 import { useEffect, useState } from "react";
-import rewardBg from "../../assets/images/reward-bg.png";
+import rewardBg from "../../assets/reward-bg.png";
 import Star from "../../assets/images/star.png";
 import rewardsGif from "../../assets/rewards.gif";
 import TimeCounter from "../time-counter";
@@ -147,40 +147,48 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
           <div className="info-wrapper flex justify-between w-full">
             <div className="flex flex-col justify-between">
               <div className="title-wrapper flex flex-col gap-1">
-                <h4 className="text-2xl font-bold text-[#0C0C0D]">
-                  Daily Earnings
-                </h4>
+                <h5 className="text-base font-bold text-[#0C0C0D]">
+                  Daily Rewards
+                </h5>
               </div>
               <div className="flex flex-col gap-2 lg:gap-3 mt-8 sm:mt-6">
-                {claimStatus?.claimed ? (
-                  <span className="block text-sm	text-[#68686F] leading-4 m-0 mb-2 font-bold">
+                {/* {claimStatus?.claimed ? ( */}
+                {true ? (
+                  <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0 mb-2">
                     {/* Next Claim in:{" "} */}
-                    <TimeCounter targetDate={nextClaimDateAtMidnight} />
+                    Login Daily to collect {claimStatus?.dailyPoint} PTS
+                    <TimeCounter targetDate={claimStatus?.nextClaim} />
                     {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
                   </span>
                 ) : (
                   <>
-                    <span className="block text-md	text-[#68686F] leading-4 m-0 mb-2 font-bold">
+                    <span className="block text-md text-[#68686F] leading-4 m-0 mb-2 font-medium">
                       Claim Your Daily Rewards
-                      {dailyRewardDataStatus?.data?.permit}
+                      {claimStatus?.dailyPoint}
                     </span>
                   </>
                 )}
               </div>
             </div>
-            <div className="flex flex-col mt-[-1rem] justify-between">
-              <Image
+            <div className="flex flex-col justify-between items-end mt-auto">
+              {/* <Image
                 src={Star.src}
                 alt="seasonEarnBg"
                 className="w-full h-auto max-w-[5.5rem] sm:max-w-[6rem] md:max-w-[8.5rem] lg:max-w-[9.5rem] xl:max-w-[11rem] xxl:max-w-[6.5rem] object-contain"
-              />
+              /> */}
               {loadingcanClaim ? (
-                <Button color="primary" disabled onClick={handleGetClaimReward}>
+                <Button
+                  className="bg-[#9B9CA1] rounded-[1.5rem] text-[#FFFFFF]"
+                  disabled
+                  onClick={handleGetClaimReward}
+                >
                   Loading
                 </Button>
               ) : (
                 <Button
-                  color="primary"
+                  className={`rounded-[1.5rem] text-[#FFFFFF] ${
+                    claimStatus?.claimed ? "bg-[#9B9CA1]" : "bg-[#000000]"
+                  }`}
                   disabled={claimStatus?.claimed}
                   onClick={handleGetClaimReward}
                 >

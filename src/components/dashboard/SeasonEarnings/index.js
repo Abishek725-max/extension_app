@@ -17,7 +17,7 @@ const SeasonEarnings = () => {
         <div className="flex justify-between items-end">
           <div className="flex flex-col gap-1">
             <h2 className="m-0 text-3xl text-white font-extrabold">
-              524.67K OPL
+              524.67K PTS
             </h2>
             <p className="m-0 text-[#9F9FA5] text-[1rem] font-[400]">
               Current Epoch Points

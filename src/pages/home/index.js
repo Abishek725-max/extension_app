@@ -35,6 +35,7 @@ import Header from "@/components/header";
 import Profile from "../../assets/images/profile.png";
 import { Image } from "@nextui-org/react";
 import dayjs from "dayjs";
+import { Slide, toast } from "react-toastify";
 
 const Home = () => {
   const router = useRouter();
@@ -44,10 +45,26 @@ const Home = () => {
   const [homepage, setHomepage] = useState(true);
 
   const [changeCopy, setChangeCopy] = useState(false);
+  const [authToken, setAuthToken] = useState();
+
+  const [data, setData] = useState(null);
+  const [rewardsHistoryData, setRewardsHistoryData] = useState([]);
+  const [rewardsRealtimeData, setRewardsRealtimeData] = useState();
+  const [rewardsTotal, setRewardsTotal] = useState([]);
+  const [allJobData, setAllJobData] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [w3aPrivatekey, setw3aPrivatekey] = useState();
+  const redirectUrl = `chrome-extension://${chrome?.runtime.id}/web-login.html`;
+
+  const [rewardsRealtimeHistoryData, setRewardsRealtimeHistoryData] =
+    useState(0);
+
+  const [rewardsRealTimeDataArray, setRewardsRealTimeDataArray] = useState([]);
 
   useEffect(() => {
-    getJobsValue();
     getPrivateKeyValue();
+    // getJobsValue();
   }, []);
 
   const getJobsValue = async () => {
@@ -60,78 +77,19 @@ const Home = () => {
   const getPrivateKeyValue = async () => {
     // const result = await getDataWithId("privateKey");
     const result = await getLocalStorage("privateKey");
-    const extensionID = await getLocalStorage("extensionID");
-    console.log("privateKeyValue in Home", result, extensionID);
+    const authToken = await getLocalStorage("auth_token");
     setPrivateKey(result);
+    setAuthToken(authToken);
+    // const extensionID = await getLocalStorage("extensionID");
   };
 
   useEffect(() => {
     // getRewardsData();
-    privateKey && initialize();
-  }, [privateKey]);
-
-  const [data, setData] = useState(null);
-  const [rewardsHistoryData, setRewardsHistoryData] = useState([]);
-  const [rewardsRealtimeData, setRewardsRealtimeData] = useState([]);
-  const [rewardsTotal, setRewardsTotal] = useState([]);
-  const [allJobData, setAllJobData] = useState([]);
-  const [authToken, setAuthToken] = useState();
-  const [loading, setLoading] = useState(false);
-  const [w3aPrivatekey, setw3aPrivatekey] = useState();
-  const redirectUrl = `chrome-extension://${chrome?.runtime.id}/web-login.html`;
-
-  const [rewardsRealtimeHistoryData, setRewardsRealtimeHistoryData] =
-    useState(0);
-
-  const [rewardsRealTimeDataArray, setRewardsRealTimeDataArray] = useState([]);
-
-  // React useEffect in your app
-
-  useEffect(() => {
-    getJobData();
-  }, []);
-
-  const getJobData = async () => {
-    const jobResult = await getLocalStorage("jobData");
-    setAllJobData(jobResult);
-  };
-
-  const initialize = async () => {
-    try {
-      const wallet = new ethers.Wallet(privateKey);
-      handleGenerateToken(wallet?.address);
-      setWalletData(wallet);
-    } catch (error) {
-      console.error("Error during registration:", error);
-    }
-  };
-
-  const handleGenerateToken = async (address) => {
-    try {
-      console.log("address", address);
-
-      const tokenData = await generateToken(address);
-      setLocalStorage("auth_token", tokenData.data.token);
-      setAuthToken(tokenData.data.token);
-      getRewardsData();
-      chrome.runtime.sendMessage(
-        {
-          type: "connect_socket",
-          data: { authToken: tokenData.data.token },
-        },
-        (response) => {
-          console.log("response in WEbsocket", response);
-
-          sendRegister(address);
-        }
-      );
-      // router?.push("/home");
-    } catch (error) {
-      console.error("Failed to generate token", error);
-    }
-  };
+    privateKey && authToken && connectWebsocket(authToken);
+  }, [privateKey, authToken]);
 
   const sendRegister = async (address) => {
+    getRewardsData();
     let extensionID = await getLocalStorage("extensionID");
     console.log("sendAddress", address);
 
@@ -157,7 +115,18 @@ const Home = () => {
         console.log("Response:", response);
         let message = JSON?.parse(response);
         if (message?.status === false) {
-          router?.push(`/register-failed?reason=${message?.message}`);
+          // router?.push(`/register-failed?reason=${message?.message}`);
+          toast.error(message?.message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Slide,
+          });
         } else if (message?.status === true) {
           // const authToken = await getLocalStorage("auth_token");
           // if (!authToken) {
@@ -166,6 +135,29 @@ const Home = () => {
         }
       }
     );
+  };
+
+  // React useEffect in your app
+
+  const connectWebsocket = async (authToken) => {
+    try {
+      const wallet = new ethers.Wallet(privateKey);
+      setWalletData(wallet);
+      chrome.runtime.sendMessage(
+        {
+          type: "connect_socket",
+          data: { authToken: authToken },
+        },
+        (response) => {
+          console.log("response in WEbsocket", response);
+
+          sendRegister(wallet?.address);
+        }
+      );
+      // router?.push("/home");
+    } catch (error) {
+      console.error("Failed to generate token", error);
+    }
   };
 
   const getRewardsData = () => {
@@ -214,14 +206,14 @@ const Home = () => {
 
       if (response) {
         setRewardsRealtimeData(
-          response?.data?.length > 0 ? response?.data[0]?.total_heartbeats : "0"
+          response?.data?.length > 0 ? response?.data[0] : 0
         );
         setRewardsRealTimeDataArray(
           response?.data?.length > 0 ? response?.data : []
         );
 
         await handleGetRewardTotal(
-          response?.data?.length > 0 ? response?.data[0] : "0"
+          response?.data?.length > 0 ? response?.data[0] : 0
         );
         await handleGetRewardsHistory(response?.data);
       }
@@ -391,7 +383,7 @@ const Home = () => {
                 <div className="flex flex-col gap-1.5">
                   <h4 className="font-bold text-2xl text-white">
                     {" "}
-                    {rewardsTotal ? rewardsTotal : 0} OPL
+                    {rewardsTotal ? rewardsTotal : 0} PTS
                   </h4>
                   <p className="text-xs font-medium text-[#FFFFFF99]">
                     Current Epoch Earnings
@@ -399,11 +391,14 @@ const Home = () => {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <h4 className="font-bold text-2xl text-white text-right">
-                    {rewardsRealtimeData
+                    {rewardsRealtimeData?.total_heartbeats !== undefined
                       ? Number(rewardsRealtimeData?.total_heartbeats) +
                         Number(rewardsRealtimeHistoryData)
+                      : rewardsRealtimeHistoryData !== undefined ||
+                        rewardsRealtimeHistoryData !== null
+                      ? Number(rewardsRealtimeHistoryData)
                       : 0}{" "}
-                    OPL
+                    PTS
                   </h4>
                   <p className="text-xs font-medium text-[#FFFFFF99] text-right">
                     Today&apos;s Earnings
@@ -423,7 +418,7 @@ const Home = () => {
               <ReferToReward authToken={authToken} />
             </div>
 
-            <div className="flex bg-[#fff] w-full mt-5 p-4 flex-col gap-4 rounded-md overflow-y-auto">
+            {/* <div className="flex bg-[#fff] w-full mt-5 p-4 flex-col gap-4 rounded-md overflow-y-auto">
               <h4 className="text-lg font-bold text-black">
                 Received All Job Data
               </h4>
@@ -483,7 +478,7 @@ const Home = () => {
                   </h2>
                 </>
               )}
-            </div>
+            </div> */}
           </div>
         </section>
       </>

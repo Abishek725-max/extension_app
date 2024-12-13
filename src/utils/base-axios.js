@@ -3,6 +3,7 @@ import Router from "next/router"; // Import Router from Next.js
 import { clearLocalStorage, getLocalStorage } from "./common";
 
 let BASE_URL = "https://dataapi.openledger.dev/api/v1/";
+// let BASE_URL = "http://192.168.18.89:8081/api/v1";
 
 const appAxios = axios.create({
   baseURL: BASE_URL,
@@ -56,7 +57,7 @@ appAxios.interceptors.response.use(
       //
 
       // Redirect user to login or welcome page
-      // Router.push("/welcome");
+      Router.push("/welcome");
       // clearLocalStorage();
     } else if (statusCode === 500) {
       console.error("Server error (500).");

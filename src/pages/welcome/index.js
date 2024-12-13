@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Image, Input } from "@nextui-org/react";
 import Logo from "../../assets/images/logo.png";
 import { useRouter } from "next/router";
+import rewardBg from "../../assets/images/reward-bg.png";
 
 import {
   Dropdown,
@@ -24,7 +25,7 @@ const Welcome = () => {
 
   const handleCallback = async () => {
     // const result = await getDataWithId("privateKey");
-    const result = await getLocalStorage("privateKey");
+    const result = await getLocalStorage("auth_token");
     console.log("Result:", result);
 
     setTimeout(async () => {
