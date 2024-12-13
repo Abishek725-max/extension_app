@@ -185,3 +185,58 @@ export const handleCopytoClipboard = (keydata, valuedata, setChangeCopy) => {
     }, 3000);
   });
 };
+
+export async function getAvailableMemoryPercentage() {
+  // Check if the Chrome memory API is available
+  if (chrome.system && chrome.system.memory) {
+    try {
+      // Get memory info
+      const memoryInfo = await new Promise((resolve, reject) => {
+        chrome.system.memory.getInfo((info) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(info);
+          }
+        });
+      });
+
+      console.log("memoryInfo", memoryInfo);
+
+      // Calculate available memory percentage
+      const totalMemory = memoryInfo.capacity;
+      const availableMemory = memoryInfo.availableCapacity;
+
+      const availableMemoryPercentage = (
+        (availableMemory / totalMemory) *
+        100
+      ).toFixed(2);
+
+      return {
+        totalMemory,
+        availableMemory,
+        availableMemoryPercentage: parseFloat(availableMemoryPercentage),
+      };
+    } catch (error) {
+      console.error("Error getting memory information:", error);
+      return null;
+    }
+  } else {
+    console.warn("Chrome system memory API not available");
+    return null;
+  }
+}
+
+export async function getAvailableStoragePercentage() {
+  try {
+    const { quota, usage } = await navigator.storage.estimate();
+
+    const availableStorage = quota - usage;
+    const availableStoragePercentage = (availableStorage / quota) * 100;
+
+    return availableStoragePercentage.toFixed(2); // Percentage with 2 decimal points
+  } catch (error) {
+    console.error("Error calculating storage usage:", error);
+    return null;
+  }
+}

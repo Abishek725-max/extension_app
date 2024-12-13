@@ -16,6 +16,7 @@ import PointsStatistics from "@/components/dashboard/PointsStatistics ";
 import {
   checkRealtimeEntry,
   formatNumber,
+  getAvailableStoragePercentage,
   getLocalStorage,
   setLocalStorage,
   truncateAddress,
@@ -119,7 +120,9 @@ const Home = () => {
           data: { authToken: tokenData.data.token },
         },
         (response) => {
-          // sendRegister();
+          console.log("response in WEbsocket", response);
+
+          sendRegister(address);
         }
       );
       // router?.push("/home");
@@ -128,8 +131,10 @@ const Home = () => {
     }
   };
 
-  const sendRegister = async () => {
+  const sendRegister = async (address) => {
     let extensionID = await getLocalStorage("extensionID");
+    console.log("sendAddress", address);
+
     chrome.runtime.sendMessage(
       {
         type: "send_websocket_message",
@@ -142,7 +147,7 @@ const Home = () => {
             worker: {
               host: `chrome-extension://${extensionID}`,
               identity: extensionID,
-              ownerAddress: walletData?.address ?? "",
+              ownerAddress: address ?? "",
               type: "Extension",
             },
           },
@@ -249,6 +254,66 @@ const Home = () => {
       dayjs(item.date).isSame(dayjs(realtimeDate), "day")
     );
   };
+
+  // async function sendHeartbeat() {
+  //   try {
+  //     const extensionId = chrome?.runtime.id;
+  //     let privateKey = await getLocalStorage("privateKey");
+  //     const wallet = new ethers.Wallet(privateKey);
+
+  //     // Retrieve available TensorFlow models (assuming you're using TensorFlow.js)
+  //     const models = await tf.io.listModels();
+  //     console.log("Available models:", models);
+
+  //     const memoryInfo = await getAvailableMemoryPercentage();
+  //     if (memoryInfo) {
+  //       console.log(
+  //         `Available Memory: ${memoryInfo.availableMemoryPercentage}%`
+  //       );
+  //     }
+
+  //     console.log("Storage stats:", await getAvailableStoragePercentage());
+
+  //     // chrome.runtime.sendMessage({ type: "GET_GPU_INFO" }, (response) => {
+  //     //   console.log("GPU Info:", response);
+  //     // });
+
+  //     // Get GPU info by sending a message to the content script
+
+  //     const heartbeatMessage = {
+  //       Worker: {
+  //         Identity: extensionId,
+  //         Address: wallet?.address,
+  //         Type: "HEARTBEAT",
+  //         Host: `chrome-extension://${extensionId}`,
+  //       },
+  //       Capacity: {
+  //         AvailableMemory: memoryInfo?.availableMemoryPercentage,
+  //         AvailableStorage: await getAvailableStoragePercentage(),
+  //         AvailableGPU: "",
+  //         AvailableModels: models ? Object.keys(models) : [],
+  //       },
+  //       msgType: "HEARTBEAT",
+  //       workerID: extensionId,
+  //     };
+
+  //     // Send the heartbeat message (WebSocket, etc.)
+  //     if (socket) {
+  //       socket.send(JSON.stringify(heartbeatMessage));
+  //       console.log("Heartbeat sent:", heartbeatMessage);
+  //     } else {
+  //       console.error("WebSocket is not open, unable to send heartbeat.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending health check response:", error);
+  //     if (error.response) {
+  //       console.error("Error response:", error.response);
+  //     }
+  //     if (error.message) {
+  //       console.error("Error message:", error.message);
+  //     }
+  //   }
+  // }
 
   // const provider = new ethers.providers.JsonRpcProvider(
   //   "https://opt-sepolia.g.alchemy.com/v2/UvYPphRRxAVJDNPhlJTXeATqMx8xpUjj"

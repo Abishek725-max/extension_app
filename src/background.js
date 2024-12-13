@@ -30,7 +30,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "connect_socket") {
     console.log("receivedWebSocket", message);
     connectWebSocket(url, message?.data?.authToken);
-    sendResponse("successfullt");
+    socket.onopen = () => {
+      sendResponse({ type: "Connected" });
+    };
+    return true;
   }
   // return true;
 });
@@ -42,10 +45,11 @@ export function connectWebSocket(url, authToken) {
 
   function createWebSocket() {
     console.log("urllll", url, authToken);
-    const wsUrl = `${url}?authToken:${authToken}`;
+    const wsUrl = `${url}?authToken=${authToken}`;
     socket = new WebSocket(wsUrl);
 
     socket.onopen = async () => {
+      // socket.ping();
       console.log("WebSocket is connected.");
       setInterval(async () => {
         let privateKey = await getLocalStorage("privateKey");
@@ -58,16 +62,16 @@ export function connectWebSocket(url, authToken) {
 
       const message = JSON.parse(event.data);
 
-      socket?.send(
-        JSON.stringify({
-          workerID: `chrome-extension://${chrome.runtime.id}`,
-          msgType: "JOB_ASSIGNED",
-          message: {
-            Status: true,
-            Ref: message?.data?.UUID,
-          },
-        })
-      );
+      // socket?.send(
+      //   JSON.stringify({
+      //     workerID: `chrome-extension://${chrome.runtime.id}`,
+      //     msgType: "JOB_ASSIGNED",
+      //     message: {
+      //       Status: true,
+      //       Ref: message?.data?.UUID,
+      //     },
+      //   })
+      // );
 
       let privateKey = await getLocalStorage("privateKey");
       console.log("🚀 ~ socket.onmessage= ~ privateKey:", privateKey);
@@ -119,9 +123,9 @@ export function connectWebSocket(url, authToken) {
 
       console.log("Storage stats:", await getAvailableStoragePercentage());
 
-      chrome.runtime.sendMessage({ type: "GET_GPU_INFO" }, (response) => {
-        console.log("GPU Info:", response);
-      });
+      // chrome.runtime.sendMessage({ type: "GET_GPU_INFO" }, (response) => {
+      //   console.log("GPU Info:", response);
+      // });
 
       // Get GPU info by sending a message to the content script
 
@@ -138,6 +142,8 @@ export function connectWebSocket(url, authToken) {
           AvailableGPU: "",
           AvailableModels: models ? Object.keys(models) : [],
         },
+        msgType: "HEARTBEAT",
+        workerID: extensionId,
       };
 
       // Send the heartbeat message (WebSocket, etc.)

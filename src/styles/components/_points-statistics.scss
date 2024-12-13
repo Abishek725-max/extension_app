@@ -11,6 +11,11 @@
     justify-content: flex-start;
     overflow: auto;
     padding: 0.5rem 1rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      display: none;
+    }
     .chart-view {
       display: flex;
       flex-direction: column;
@@ -41,7 +46,7 @@
             &::before {
               content: "";
             }
-            &.heartbestpoint-box {
+            &.heartbeatspoint-box {
               background: linear-gradient(
                 346.25deg,
                 #fc947d 2.56%,
@@ -55,7 +60,7 @@
                 #12b9d7 95.19%
               );
             }
-            &.rankpoint-box {
+            &.missionpoint-box {
               background: linear-gradient(
                 346.25deg,
                 #ffe889 2.56%,
@@ -111,25 +116,15 @@
             }
           }
 
-          &.heartbestpoint-box {
+          &.heartbeatspoint-box {
             background: linear-gradient(
               346.25deg,
               #e7e7e9 2.56%,
               #fed2c8 95.19%
             );
-            // @media (prefers-color-scheme: dark) {
-            //   background: linear-gradient(
-            //     346.25deg,
-            //     #2c2c30 2.56%,
-            //     #2c2c30 95.19%
-            //   );
-            // }
+
             &::before {
               background: linear-gradient(0deg, #b5b6ba, #fc9078) border-box;
-              // @media (prefers-color-scheme: dark) {
-              //   background: linear-gradient(0deg, #2c2c30 75%, #fc9078)
-              //     border-box;
-              // }
             }
           }
           &.referralpoint-box {
@@ -138,87 +133,39 @@
               #e7e7e9 2.56%,
               #bcf0fb 95.19%
             );
-            // @media (prefers-color-scheme: dark) {
-            //   background: linear-gradient(
-            //     346.25deg,
-            //     #2c2c30 2.56%,
-            //     #2c2c30 95.19%
-            //   );
-            // }
+
             &::before {
               background: linear-gradient(0deg, #b5b6ba, #0ecdef) border-box;
-              // @media (prefers-color-scheme: dark) {
-              //   background: linear-gradient(0deg, #2c2c30 75%, #0ecdef)
-              //     border-box;
-              // }
             }
           }
-          // &.rankpoint-box {
-          //   background: linear-gradient(
-          //     346.25deg,
-          //     #fff3c4 2.56%,
-          //     #ffe889 95.19%
-          //   );
-          //   // @media (prefers-color-scheme: dark) {
-          //   //   background: linear-gradient(
-          //   //     346.25deg,
-          //   //     #2c2c30 2.56%,
-          //   //     #2c2c30 95.19%
-          //   //   );
-          //   // }
-          //   &::before {
-          //     background: linear-gradient(0deg, #b5b6ba, #ffe889) border-box;
-          //     // @media (prefers-color-scheme: dark) {
-          //     //   background: linear-gradient(0deg, #2c2c30 75%, #ffe889)
-          //     //     border-box;
-          //     // }
-          //   }
-
-          //   // border: 0.7px solid #ffe889;
-          // }
-          // &.spacepoint-box {
-          //   background: linear-gradient(
-          //     346.25deg,
-          //     #97e8c5 2.56%,
-          //     #76e8b7 95.19%
-          //   );
-          //   // @media (prefers-color-scheme: dark) {
-          //   //   background: linear-gradient(
-          //   //     346.25deg,
-          //   //     #2c2c30 2.56%,
-          //   //     #2c2c30 95.19%
-          //   //   );
-          //   // }
-          //   &::before {
-          //     background: linear-gradient(0deg, #b5b6ba, #76e8b7) border-box;
-          //     // @media (prefers-color-scheme: dark) {
-          //     //   background: linear-gradient(0deg, #2c2c30 75%, #76e8b7)
-          //     //     border-box;
-          //     // }
-          //   }
-
-          //   // border: 0.7px solid #76e8b7;
-          // }
-
-          &.bonuspoint-box {
+          &.missionpoint-box {
+            // background: linear-gradient(
+            //   346.25deg,
+            //   #ffe889 2.56%,
+            //   #fac800 95.19%
+            // );
             background: linear-gradient(
               346.25deg,
-              #97e8c5 2.56%,
-              #76e8b7 95.19%
+              #ffe88940 2.56%,
+              #fac8007a 95.19%
             );
-            // @media (prefers-color-scheme: dark) {
-            //   background: linear-gradient(
-            //     346.25deg,
-            //     #2c2c30 2.56%,
-            //     #2c2c30 95.19%
-            //   );
-            // }
+            &::before {
+              background: linear-gradient(0deg, #b5b6ba, #fac800) border-box;
+            }
+          }
+          &.bonuspoint-box {
+            // background: linear-gradient(
+            //   346.25deg,
+            //   #97e8c5 2.56%,
+            //   #76e8b7 95.19%
+            // );
+            background: linear-gradient(
+              346.25deg,
+              #e4fff3 2.56%,
+              #76e8b72b 95.19%
+            );
             &::before {
               background: linear-gradient(0deg, #b5b6ba, #76e8b7) border-box;
-              // @media (prefers-color-scheme: dark) {
-              //   background: linear-gradient(0deg, #2c2c30 75%, #76e8b7)
-              //     border-box;
-              // }
             }
 
             // border: 0.7px solid #76e8b7;
@@ -236,19 +183,17 @@
               rgba(231, 231, 233, 0.4) 95.19%
             );
           }
-          // &.bonuspoint-box {
-          //   background: linear-gradient(
-          //     346.25deg,
-          //     #97e8c5 2.56%,
-          //     #28b87a 95.19%
-          //   );
-          // }
         }
       }
     }
   }
 
   .tooltip-info-statitics {
+    .dotBox {
+      height: 0.5rem;
+      width: 0.5rem;
+      display: inline-flex;
+    }
     ul {
       display: flex;
       flex-direction: column;
@@ -259,6 +204,11 @@
         justify-content: space-between;
         width: 6.5rem;
         gap: 0.5rem;
+        span {
+          display: flex;
+          gap: 0.25rem;
+          align-items: center;
+        }
       }
     }
   }
@@ -273,7 +223,7 @@
             &::before {
               content: "";
             }
-            &.heartbestpoint-box {
+            &.heartbeatspoint-box {
               background: linear-gradient(
                 346.25deg,
                 #2c2c30 2.56%,
@@ -295,31 +245,6 @@
                   border-box;
               }
             }
-            &.rankpoint-box {
-              background: linear-gradient(
-                346.25deg,
-                #2c2c30 2.56%,
-                #2c2c30 95.19%
-              );
-              &::before {
-                background: linear-gradient(0deg, #2c2c30 75%, #ffe889)
-                  border-box;
-              }
-
-              // border: 0.7px solid #ffe889;
-            }
-            // &.spacepoint-box {
-            //   background: linear-gradient(
-            //     346.25deg,
-            //     #2c2c30 2.56%,
-            //     #2c2c30 95.19%
-            //   );
-            //   &::before {
-            //     background: linear-gradient(0deg, #2c2c30 75%, #76e8b7)
-            //       border-box;
-            //   }
-            //   // border: 0.7px solid #76e8b7;
-            // }
             &.bonuspoint-box {
               background: linear-gradient(
                 346.25deg,
@@ -331,6 +256,19 @@
                   border-box;
               }
               // border: 0.7px solid #76e8b7;
+            }
+            &.missionpoint-box {
+              background: linear-gradient(
+                346.25deg,
+                #2c2c30 2.56%,
+                #2c2c30 95.19%
+              );
+              &::before {
+                background: linear-gradient(0deg, #2c2c30 75%, #ffe889)
+                  border-box;
+              }
+
+              // border: 0.7px solid #ffe889;
             }
             &.dummypoint-box {
               background: linear-gradient(
@@ -347,7 +285,7 @@
               &::before {
                 content: "";
               }
-              &.heartbestpoint-box {
+              &.heartbeatspoint-box {
                 background: linear-gradient(
                   346.25deg,
                   #fc947d 2.56%,
@@ -361,18 +299,18 @@
                   #12b9d7 95.19%
                 );
               }
-              &.rankpoint-box {
-                background: linear-gradient(
-                  346.25deg,
-                  #ffe889 2.56%,
-                  #fac800 95.19%
-                );
-              }
-              &.spacepoint-box {
+              &.bonuspoint-box {
                 background: linear-gradient(
                   346.25deg,
                   #97e8c5 2.56%,
                   #28b87a 95.19%
+                );
+              }
+              &.missionpoint-box {
+                background: linear-gradient(
+                  346.25deg,
+                  #ffe889 2.56%,
+                  #fac800 95.19%
                 );
               }
             }

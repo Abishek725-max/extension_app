@@ -87,57 +87,15 @@ const epochPoints = [
 export const calculatePercentage = (value, total) => (value / total) * 10;
 
 // Step 1: Find the maximum total value
+
 export const maxTotal = (data) => {
   return Math.max(...data.map((point) => point?.total_points));
 };
 
 // Step 2: Calculate rem values based on the ratio to the maximum total
-export const epochPointsWithHeight = (
-  data,
-  maximumTotal,
-  realTimeData,
-  rewardsRealTimeDataArray,
-  checkRealtimeDateinHistory
-) => {
-  const found = rewardsRealTimeDataArray?.find((item) =>
-    dayjs(item.date).isSame(dayjs(checkRealtimeDateinHistory), "day")
-  );
-
-  const todayHeartBeats = {
-    date: rewardsRealTimeDataArray[0]?.date,
-    details: [
-      {
-        claim_type: 3,
-        points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
-      },
-    ],
-    total_points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
-  };
-  if (!found) {
-    data?.push(todayHeartBeats);
-  }
+export const epochPointsWithHeight = (data, maximumTotal, realTimeData) => {
   const newData = data.map((point) => {
     const chartHeight = (point.total_points / maximumTotal) * 10;
-    const total_points =
-      rewardsRealTimeDataArray[0]?.date === point?.date
-        ? point.total_points +
-          Number(rewardsRealTimeDataArray[0]?.total_heartbeats)
-        : point.total_points;
-    const claimMining = point?.details?.find((e) => e.claim_type === 3);
-    if (rewardsRealTimeDataArray[0]?.date === point?.date) {
-      if (Number(rewardsRealTimeDataArray[0]?.total_heartbeats) > 0) {
-        if (claimMining === undefined) {
-          point.details.push({
-            claim_type: 3,
-            points: Number(rewardsRealTimeDataArray[0]?.total_heartbeats),
-          });
-        } else {
-          claimMining.points = Number(
-            rewardsRealTimeDataArray[0]?.total_heartbeats
-          );
-        }
-      }
-    }
 
     const detailsGet = point.details.map((pointDetail) => {
       return {
@@ -148,7 +106,7 @@ export const epochPointsWithHeight = (
             : pointDetail.claim_type == 2
             ? "mission"
             : pointDetail.claim_type == 3
-            ? "mining"
+            ? "heartbeats" //heartbeats
             : pointDetail.claim_type == 4
             ? "tier"
             : pointDetail.claim_type == 5
@@ -159,7 +117,7 @@ export const epochPointsWithHeight = (
     const details = detailsGet.sort((a, b) => a.claim_type - b.claim_type);
     return {
       ...point,
-      total_points,
+      // total_points,
       details,
       chartHeight: `${
         Math.floor(chartHeight) > 0 ? chartHeight : chartHeight + 0.4

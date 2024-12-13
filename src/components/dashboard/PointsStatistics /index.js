@@ -54,9 +54,9 @@ const PointsStatistics = ({ data, realTimeData, rewardsRealTimeDataArray }) => {
   const pointsHeightData = epochPointsWithHeight(
     data,
     getMaxTotal,
-    realTimeData,
-    rewardsRealTimeDataArray,
-    checkRealtimeDateinHistory
+    realTimeData
+    // rewardsRealTimeDataArray
+    // checkRealtimeDateinHistory
   );
   const pointsHeight = pointsHeightData.sort((a, b) =>
     dayjs(a.date).diff(dayjs(b.date))
@@ -94,7 +94,7 @@ const PointsStatistics = ({ data, realTimeData, rewardsRealTimeDataArray }) => {
   // const generateEntryDate =
   //   data.length > 0 ? getLatestEntry : realTimeData.date;
 
-  const entries = generateEntries(getLatestEntry, data?.length);
+  const entries = generateEntries(getLatestEntry, data.length);
 
   return (
     <div className="statiticschart-card border border-[#E7E7E9] dark:border-[#3E3E3E] h-full flex flex-col justify-between">

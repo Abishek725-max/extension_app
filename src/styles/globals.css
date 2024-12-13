@@ -20,7 +20,8 @@ body {
 
 /* Enable only while building extension */
 body {
-  width: 400px !important;
+  width: 360px !important;
+  margin: 0 auto;
   height: 700px !important;
 }
 

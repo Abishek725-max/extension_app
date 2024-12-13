@@ -24,7 +24,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   const [time, setTime] = useState();
   const [nextDayTime, setnextDayTime] = useState();
   const [dailyRewardDataStatus, setDailyRewardDataStatus] = useState(null);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const [nextClaimDateAtMidnight, setNextClaimDateAtMidnight] = useState(null);
   const [claimStatus, setClaimStatus] = useState(null);
 
@@ -191,11 +191,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
           </div>
         </div>
       </div>
-      <Modal
-        onClose={hideModal}
-        isOpen={isModalVisible}
-        onOpenChange={onOpenChange}
-      >
+      <Modal onClose={hideModal} isOpen={isModalVisible}>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             Daily Earnings
