@@ -11,7 +11,7 @@ const RegisterFailed = () => {
   const reason = searchParams.get("reason");
 
   return (
-    <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#eef8ff] h-[100vh] flex flex-col items-center justify-center">
+    <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#ffffff] h-[100vh] flex flex-col items-center justify-center">
       <div className="flex flex-col gap-2 text-center items-center justify-center">
         <div className="h-[50px] w-[50px]">
           {/* <Lottie animationData={animationData} loop={true} autPTSay={true} /> */}

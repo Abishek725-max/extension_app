@@ -45,7 +45,7 @@ const CreateWallet = () => {
 
   return (
     <>
-      <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#eef8ff] h-[100vh] flex flex-col items-center justify-center">
+      <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#ffffff] h-[100vh] flex flex-col items-center justify-center">
         {loading ? (
           <>
             <div className="flex flex-col gap-2 text-center">

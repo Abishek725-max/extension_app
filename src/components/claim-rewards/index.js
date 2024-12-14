@@ -146,7 +146,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   return (
     <>
       <div
-        className="collector-card relative rounded-lg w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full"
+        className="collector-card border border-[#91e8f8] relative rounded-lg w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full"
         style={{
           backgroundImage: `url(${rewardBg.src})`,
           backgroundPosition: "center",
@@ -156,26 +156,25 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
       >
         <div className="z-10 inset-0 flex px-4 py-3 justify-between h-full">
           <div className="info-wrapper flex justify-between w-full">
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between gap-1.5">
               <div className="title-wrapper flex flex-col gap-1">
                 <h5 className="text-base font-bold text-[#0C0C0D]">
                   Daily Rewards
                 </h5>
               </div>
-              <div className="flex flex-col gap-2 lg:gap-3 mt-8 sm:mt-6">
+              <div className="flex flex-col gap-2 lg:gap-3">
                 {/* {claimStatus?.claimed ? ( */}
-                {true ? (
-                  <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0 mb-2">
-                    {/* Next Claim in:{" "} */}
-                    Login Daily to collect {claimStatus?.dailyPoint} PTS
-                    <TimeCounter targetDate={claimStatus?.nextClaim} />
-                    {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
+                {claimStatus?.claimed ? (
+                  <span className="block text-md text-[#68686F] leading-4 m-0 font-medium">
+                    Daily Rewards {claimStatus?.dailyPoint} PTS
                   </span>
                 ) : (
                   <>
-                    <span className="block text-md text-[#68686F] leading-4 m-0 mb-2 font-medium">
-                      Claim Your Daily Rewards
-                      {claimStatus?.dailyPoint}
+                    <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0">
+                      {/* Next Claim in:{" "} */}
+                      Login Daily to collect {claimStatus?.dailyPoint} PTS
+                      <TimeCounter targetDate={claimStatus?.nextClaim} />
+                      {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
                     </span>
                   </>
                 )}

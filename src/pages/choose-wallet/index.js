@@ -7,7 +7,7 @@ const ChooseWallet = () => {
   const router = useRouter();
 
   return (
-    <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#eef8ff] h-[100vh] flex flex-col items-center justify-center">
+    <section className="max-w-[360px] gap-3 w-full mx-auto bg-[#ffffff] h-[100vh] flex flex-col items-center justify-center">
       <Image alt="logo" src={logo.src} className="h-12 w-12 object-contain" />
       <div className="flex flex-col gap-2 text-center">
         <h4 className="font-bold text-2xl text-[#3b3b3d] m-0">

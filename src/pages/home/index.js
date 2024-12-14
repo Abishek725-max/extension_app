@@ -316,7 +316,7 @@ const Home = () => {
   return (
     <>
       <>
-        <section className="max-w-[360px] w-full mx-auto bg-[#eef8ff] min-h-[100vh] flex flex-col">
+        <section className="max-w-[360px] w-full mx-auto bg-[#ffffff] min-h-[100vh] flex flex-col">
           <Header setHomepage={() => setHomepage(false)} />
 
           <div className="flex p-4 flex-col">

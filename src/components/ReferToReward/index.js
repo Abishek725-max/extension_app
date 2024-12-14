@@ -57,7 +57,10 @@ const ReferToReward = ({ authToken }) => {
             })
           }
         >
-          <button className="text-base leading-6 text-white bg-[#000000] py-2 px-3 rounded-lg border border-white shadow-cus-1">
+          <button
+            disabled
+            className="text-base leading-6 text-white bg-[#000000] py-2 px-3 rounded-lg border border-white shadow-cus-1 disabled:bg-[#D3D3D3] disabled:border-[#D3D3D3] disabled:text-[#636363]"
+          >
             Refer a Friend
           </button>
         </CopyToClipboard>

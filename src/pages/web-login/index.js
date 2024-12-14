@@ -312,13 +312,14 @@ const WebLogin = () => {
                     Your Node setup is only a few minutes away
                   </h2>
                   <button
-                    onClick={handleweb3Auth}
+                    onClick={() => setIsModalVisible(true)}
                     type="button"
-                    className="mt-4 flex w-full justify-center items-center gap-2 rounded-lg bg-[#fff] border border-[#FF6600] p-3 text-base font-bold text-black"
+                    className="mt-4 flex w-full justify-center items-center gap-2 rounded-lg bg-[#ff6600] border border-[#FF6600] px-3 py-2 max-w-[290px] mx-auto text-base font-bold text-white"
                   >
                     <svg
                       width="29"
                       height="28"
+                      className="w-6 h-6"
                       viewBox="0 0 29 28"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -326,19 +327,19 @@ const WebLogin = () => {
                       <g clipPath="url(#clip0_2349_3125)">
                         <path
                           d="M14.4998 11.4545V16.8763H22.0343C21.7034 18.62 20.7106 20.0964 19.2215 21.0891L23.7651 24.6146C26.4124 22.171 27.9397 18.5819 27.9397 14.3183C27.9397 13.3256 27.8506 12.3709 27.6851 11.4547L14.4998 11.4545Z"
-                          fill="#4285F4"
+                          fill="#ffffff"
                         />
                         <path
                           d="M6.6538 16.6647L5.62904 17.4491L2.00171 20.2746C4.30534 24.8436 9.02681 28 14.4995 28C18.2794 28 21.4484 26.7527 23.7649 24.6146L19.2212 21.0891C17.974 21.9291 16.383 22.4383 14.4995 22.4383C10.8595 22.4383 7.76687 19.9819 6.65952 16.6728L6.6538 16.6647Z"
-                          fill="#34A853"
+                          fill="#ffffff"
                         />
                         <path
                           d="M2.00171 7.72546C1.04722 9.60902 0.5 11.7345 0.5 13.9999C0.5 16.2653 1.04722 18.3908 2.00171 20.2744C2.00171 20.287 6.65997 16.6598 6.65997 16.6598C6.37997 15.8198 6.21447 14.929 6.21447 13.9998C6.21447 13.0706 6.37997 12.1797 6.65997 11.3397L2.00171 7.72546Z"
-                          fill="#FBBC05"
+                          fill="#ffffff"
                         />
                         <path
                           d="M14.4998 5.57454C16.5616 5.57454 18.3943 6.28725 19.858 7.66181L23.867 3.65277C21.4361 1.38736 18.2798 0 14.4998 0C9.02709 0 4.30534 3.14363 2.00171 7.72546L6.65983 11.34C7.76703 8.03089 10.8598 5.57454 14.4998 5.57454Z"
-                          fill="#EA4335"
+                          fill="#ffffff"
                         />
                       </g>
                       <defs>
@@ -352,29 +353,27 @@ const WebLogin = () => {
                         </clipPath>
                       </defs>
                     </svg>
-                    Continue with Google
+                    Create an Account
                   </button>
-                  <p className="m-0 text-xs font-semibold text-black text-center mt-2">
-                    New User{" "}
-                    <span
-                      onClick={() => setIsModalVisible(true)}
-                      className="text-[#FF6600] cursor-pointer"
-                    >
-                      Create Account
-                    </span>
-                  </p>
+                  <button
+                    onClick={handleweb3Auth}
+                    type="button"
+                    className="mt-4 flex w-full justify-center items-center gap-2 rounded-lg bg-[#fff] border border-[#FF6600] px-3 py-2 max-w-[290px] mx-auto text-base font-bold text-black"
+                  >
+                    Login Node
+                  </button>
 
                   <p className="m-0 text-xs leading-6 text-[#52525B] mt-6 text-center">
                     By continuing, you are indicating that you accept our{" "}
                     <span
-                      className="underline cursor-pointer"
+                      className="underline cursor-pointer text-[#FF6600]"
                       onClick={() => hanldeClick("terms")}
                     >
                       Terms of Service
                     </span>{" "}
                     and{" "}
                     <span
-                      className="underline cursor-pointer"
+                      className="underline cursor-pointer text-[#FF6600]"
                       onClick={() => hanldeClick("privacy")}
                     >
                       Privacy Policy
@@ -393,7 +392,7 @@ const WebLogin = () => {
             >
               <ModalContent>
                 <ModalBody>
-                  <div className="flex flex-col gap-4 items-center justify-center">
+                  <div className="flex flex-col gap-4 items-center justify-center py-2">
                     <Image
                       alt="loginPopupImg"
                       src={loginPopupImg.src}
@@ -403,22 +402,25 @@ const WebLogin = () => {
                       }}
                     />
                     <div className="'content flex flex-col gap-1.5 text-center">
-                      <h2 className="m-0 text-black text-base font-semibold">
+                      <h2 className="m-0 text-black text-base font-bold">
                         Create New Account
                       </h2>
                       <p className="m-0 text-xs text-[#68686F] leading-6">
-                        To create a new account, click here to open your web
-                        browser, log in with Google, and then return to the
-                        mobile app.
+                        <span className="text-[#ff6600]">Step 1:</span> Create
+                        an account on the Web App
+                      </p>
+                      <p className="m-0 text-xs text-[#68686F] leading-6">
+                        <span className="text-[#ff6600]">Step 2:</span> Return
+                        here to log in to Node
                       </p>
                     </div>
                     <div className="flex flex-col w-full">
                       <button
                         onClick={() => openWebsite()}
                         type="button"
-                        className="flex w-full justify-center items-center gap-2 rounded-lg bg-[#FF6600] border border-[#FF6600] p-3 text-base font-bold text-white"
+                        className="flex w-fit mx-auto justify-center items-center gap-2 rounded-lg bg-[#FF6600] border border-[#FF6600] px-3 py-2 text-base font-bold text-white"
                       >
-                        Open Browser
+                        continue
                       </button>
                       <p
                         className="mt-2 m-0 text-center underline text-xs text-[#82838A] cursor-pointer"
