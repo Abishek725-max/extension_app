@@ -32,11 +32,11 @@ const Welcome = () => {
       if (result) {
         router?.push(`/home`);
       } else {
-        // router?.push("/web-login");
-        const url = `chrome-extension://${chrome.runtime.id}/web-login.html`;
+        router?.push("/web-login");
+        // const url = `chrome-extension://${chrome.runtime.id}/web-login.html`;
 
-        // Open the URL in a new tab
-        chrome.tabs.create({ url: url });
+        // // Open the URL in a new tab
+        // chrome.tabs.create({ url: url });
       }
     }, 3000);
   };

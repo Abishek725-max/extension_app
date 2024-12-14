@@ -24,7 +24,7 @@ export const generateToken = async (address) => {
 
 export const claimReward = async () => {
   try {
-    const response = await rewardAxios.put("/claim_reward");
+    const response = await rewardAxios.get("/claim_reward");
     console.log("🚀 ~ claimReward ~ response:", response);
     return response.data;
   } catch (error) {

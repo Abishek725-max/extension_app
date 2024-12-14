@@ -4,6 +4,7 @@ import rewardBg from "../../assets/reward-bg.png";
 import Star from "../../assets/images/star.png";
 import rewardsGif from "../../assets/rewards.gif";
 import TimeCounter from "../time-counter";
+import successAnimation from "../../assets/images/success-animation.json";
 import {
   Image,
   Modal,
@@ -16,6 +17,11 @@ import {
 } from "@nextui-org/react";
 import Countdown from "react-countdown";
 import dayjs from "dayjs";
+// import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+});
 
 const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -131,6 +137,11 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   //   nextClaimDate.setHours(0, 0, 0, 0); // Set time to midnight
   //   return nextClaimDate;
   // }
+  const defaultOptions = {
+    loop: true, // or false
+    autoplay: true, // or false
+    animationData: successAnimation,
+  };
 
   return (
     <>
@@ -199,7 +210,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
           </div>
         </div>
       </div>
-      <Modal onClose={hideModal} isOpen={isModalVisible}>
+      {/* <Modal onClose={hideModal} isOpen={isModalVisible}>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             Daily Earnings
@@ -229,6 +240,45 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
               Done
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal> */}
+      <Modal
+        onClose={hideModal}
+        isOpen={isModalVisible}
+        placement="center"
+        classNames={{
+          base: "!max-w-[320px]",
+        }}
+      >
+        <ModalContent>
+          <>
+            <ModalBody>
+              <div className="flex flex-col gap-3 mt-3 items-center justify-center text-center">
+                <div className="max-w-[10rem]">
+                  <Lottie animationData={successAnimation} loop={true} />
+                </div>
+                <p className="m-0 text-base font-semibold text-[#FF6600]">
+                  You got 100 PTS Points!
+                </p>
+                <p className="m-0 text-[#68686F] dark:text-[#9F9FA5] text-sm leading-6">
+                  You have Successfully claimed. <br /> Keep the app running to
+                  get more rewards.
+                </p>
+                <div className="text-center">
+                  <Button
+                    color="primary"
+                    className="bg-[#FF6600] min-w-[9rem]"
+                    onPress={() => {
+                      hideModal();
+                      handleGetRewardRealtime();
+                    }}
+                  >
+                    Done
+                  </Button>
+                </div>
+              </div>
+            </ModalBody>
+          </>
         </ModalContent>
       </Modal>
     </>

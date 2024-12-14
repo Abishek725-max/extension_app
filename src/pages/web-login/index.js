@@ -105,7 +105,7 @@ const WebLogin = () => {
         if (web3auth.provider) {
           const user = await web3auth?.getUserInfo();
           console.log("User Info", user);
-          setLocalStorage("userInfo", user);
+          setLocalStorage("userInfo", JSON.stringify(user));
         }
       } catch (error) {
         console.error("Web3Auth initialization error:", error);
@@ -222,6 +222,17 @@ const WebLogin = () => {
     chrome.tabs.create({ url: "https://devnet.openledger.dev/dashboard" });
   };
 
+  const hanldeClick = (target) => {
+    if (target === "terms")
+      chrome.tabs.create({
+        url: "https://www.openledger.xyz/terms-and-conditions.html",
+      });
+    else
+      chrome.tabs.create({
+        url: "https://www.openledger.xyz/privacy-policy.html",
+      });
+  };
+
   // const clientId =
   //   "BNt9Lig2_Mv4Bn1UBNGZ9CaNeFRt8XZ7wU_e7jcmvI0AoNYO4HDh3BJZIIIb2X45T9MrNE3sxUNsMjNK9G6X3f4";
 
@@ -292,12 +303,12 @@ const WebLogin = () => {
                     src={loginimg.src}
                     className="h-auto w-full object-contain"
                     classNames={{
-                      base: "!max-w-full",
+                      wrapper: "!max-w-[250px] mx-auto",
                     }}
                   />
                 </div>
                 <div className="content flex flex-col">
-                  <h2 className="text-xl font-bold">
+                  <h2 className="text-lg font-semibold text-center">
                     Your Node setup is only a few minutes away
                   </h2>
                   <button
@@ -347,15 +358,28 @@ const WebLogin = () => {
                     New User{" "}
                     <span
                       onClick={() => setIsModalVisible(true)}
-                      className="text-[#FF6600]"
+                      className="text-[#FF6600] cursor-pointer"
                     >
                       Create Account
                     </span>
                   </p>
 
                   <p className="m-0 text-xs leading-6 text-[#52525B] mt-6 text-center">
-                    By continuing, you are indicating that you accept our Terms
-                    of Service and Privacy Policy.
+                    By continuing, you are indicating that you accept our{" "}
+                    <span
+                      className="underline cursor-pointer"
+                      onClick={() => hanldeClick("terms")}
+                    >
+                      Terms of Service
+                    </span>{" "}
+                    and{" "}
+                    <span
+                      className="underline cursor-pointer"
+                      onClick={() => hanldeClick("privacy")}
+                    >
+                      Privacy Policy
+                    </span>
+                    .
                   </p>
                 </div>
               </div>
@@ -375,7 +399,7 @@ const WebLogin = () => {
                       src={loginPopupImg.src}
                       className="w-full h-auto max-w-[96px]"
                       classNames={{
-                        base: "!max-w-full",
+                        base: "!max-w-[320px]",
                       }}
                     />
                     <div className="'content flex flex-col gap-1.5 text-center">
@@ -397,7 +421,7 @@ const WebLogin = () => {
                         Open Browser
                       </button>
                       <p
-                        className="mt-2 m-0 text-center underline text-xs text-[#82838A]"
+                        className="mt-2 m-0 text-center underline text-xs text-[#82838A] cursor-pointer"
                         onClick={() => setIsModalVisible(false)}
                       >
                         Sorry, Not Now.

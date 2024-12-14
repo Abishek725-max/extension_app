@@ -22,7 +22,7 @@ body {
 body {
   width: 360px !important;
   margin: 0 auto;
-  height: 700px !important;
+  /* height: 700px !important;  */
 }
 
 @layer utilities {

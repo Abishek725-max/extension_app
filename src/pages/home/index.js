@@ -90,7 +90,7 @@ const Home = () => {
 
   const sendRegister = async (address) => {
     getRewardsData();
-    let extensionID = await getLocalStorage("extensionID");
+    let extensionID = chrome.runtime.id;
     console.log("sendAddress", address);
 
     chrome.runtime.sendMessage(
