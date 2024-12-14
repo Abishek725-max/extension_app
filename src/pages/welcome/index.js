@@ -42,7 +42,7 @@ const Welcome = () => {
   };
 
   return (
-    <section className="max-w-[360px] w-full mx-auto bg-[#eef8ff] h-[100vh] flex flex-col justify-around">
+    <section className="max-w-[360px] w-full mx-auto bg-[#fff] h-[100vh] flex flex-col justify-around">
       <div className="flex flex-col gap-3 items-center justify-center p-4">
         <h4 className="font-bold text-xl text-[#3c3a3b]">
           Welcome to the OpenLedger
