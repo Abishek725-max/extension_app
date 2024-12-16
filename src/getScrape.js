@@ -8,103 +8,96 @@ const showdown = require("showdown");
 const { convert } = require("html-to-markdown");
 
 export default async function getScrape(url) {
-  if (!url) {
-    return;
-  }
+  if (!url) return;
 
   try {
     const response = await fetch(url);
-    console.log("🚀 ~ handler ~ response:", response);
     const htmlText = await response.text();
 
-    // // Parse the HTML content
-    // // const doc = parseDOM(htmlText);
-    // // const base = new URL(url);
-
-    // // console.log("doc", doc);
-
-    // // // Convert the cleaned DOM back to HTML
-    // // const cleanedHtml = DomUtils.getInnerHTML(doc[1]);
-
-    // // console.log("cleanedHtml", cleanedHtml);
-    // let doc = new DOMParser()?.parseFromString(htmlContent, "text/html");
-
-    // // Remove unwanted elements like <script>, <style>, <iframe>, <meta>, <footer>, etc.
-    // let unwantedTags = [
-    //   "script",
-    //   "style",
-    //   "iframe",
-    //   "meta",
-    //   "footer",
-    //   "noscript",
-    // ];
-    // unwantedTags.forEach((tag) => {
-    //   let elements = doc.querySelectorAll(tag);
-    //   elements.forEach((el) => el.remove());
-    // });
-
-    // // Extract the inner HTML
-
-    // const turndownService = new TurndownService();
     const $ = cheerio.load(htmlText);
 
-    // Remove unwanted elements like <script>, <style>, <iframe>, <meta>, <footer>, etc.
+    // Remove unwanted elements
     $("script, style, iframe, meta, footer, noscript").remove();
 
-    // Convert the cleaned HTML to markdown (basic conversion)
-    function htmlToMarkdown(node) {
-      const tagName = node.name;
-      switch (tagName) {
+    // Custom markdown conversion function
+    function convertToMarkdown(element) {
+      if (!element) return "";
+
+      const convertChildren = (el) => {
+        return $(el)
+          .children()
+          .map((i, child) => {
+            return convertToMarkdown(child);
+          })
+          .get()
+          .join("\n");
+      };
+
+      switch (element.name) {
         case "h1":
-          return `# ${$(node).text()}\n`;
+          return `# ${$(element).text()}\n`;
         case "h2":
-          return `## ${$(node).text()}\n`;
+          return `## ${$(element).text()}\n`;
         case "h3":
-          return `### ${$(node).text()}\n`;
+          return `### ${$(element).text()}\n`;
+        case "h4":
+          return `#### ${$(element).text()}\n`;
+        case "h5":
+          return `##### ${$(element).text()}\n`;
+        case "h6":
+          return `###### ${$(element).text()}\n`;
         case "p":
-          return `${$(node).text()}\n`;
-        case "div":
-          return `${$(node).text()}\n`;
+          return `${$(element).text()}\n`;
         case "ul":
           return (
-            $(node)
-              .children()
+            $(element)
+              .children("li")
               .map((i, li) => `- ${$(li).text()}`)
               .get()
               .join("\n") + "\n"
           );
-        case "li":
-          return `- ${$(node).text()}\n`;
+        case "ol":
+          return (
+            $(element)
+              .children("li")
+              .map((i, li) => `${i + 1}. ${$(li).text()}`)
+              .get()
+              .join("\n") + "\n"
+          );
         case "a":
-          return `[${$(node).text()}](${$(node).attr("href")})`;
+          return `[${$(element).text()}](${$(element).attr("href")})`;
         case "img":
-          return `![${$(node).attr("alt")}](${$(node).attr("src")})`;
-
+          return `![${$(element).attr("alt") || ""}](${$(element).attr(
+            "src"
+          )})`;
+        case "strong":
+        case "b":
+          return `**${$(element).text()}**`;
+        case "em":
+        case "i":
+          return `*${$(element).text()}*`;
+        case "code":
+          return `\`${$(element).text()}\``;
+        case "blockquote":
+          return `> ${$(element).text()}\n`;
         default:
-          return $(node).text() || "";
+          return convertChildren(element);
       }
     }
 
-    const cleanedHtml = $("body").html();
+    // Convert body to markdown
+    const markdown = $("body")
+      .children()
+      .map((i, el) => convertToMarkdown(el))
+      .get()
+      .join("\n");
 
-    // Traverse the body and convert to markdown
-    // let markdownContent = "";
-    // $("body")
-    //   .children()
-    //   .each((i, el) => {
-    //     markdownContent += htmlToMarkdown(el);
-    //   });
+    console.log("markdown", markdown);
 
-    console.log("markdownContent", convert(cleanedHtml));
-
-    const jsonResult = {
+    return {
       success: true,
-      data: {
-        markdown: convert(cleanedHtml),
-      },
+      data: { markdown },
     };
-
-    return jsonResult;
   } catch (error) {
     console.error("Error fetching or parsing HTML:", error);
   }

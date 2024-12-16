@@ -22,6 +22,7 @@ import {
   truncateAddress,
 } from "@/utils/common";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 
 import TimeCounter from "@/components/time-counter";
 import ClaimRewards from "@/components/claim-rewards";
@@ -33,7 +34,7 @@ import ReferToReward from "@/components/ReferToReward";
 import Header from "@/components/header";
 
 import Profile from "../../assets/images/profile.png";
-import { Image } from "@nextui-org/react";
+import { Image, Tooltip } from "@nextui-org/react";
 import dayjs from "dayjs";
 import { Slide, toast } from "react-toastify";
 
@@ -385,9 +386,44 @@ const Home = () => {
                     {" "}
                     {rewardsTotal ? rewardsTotal : 0} PTS
                   </h4>
-                  <p className="text-xs font-medium text-[#FFFFFF99]">
-                    Current Epoch Earnings
-                  </p>
+                  <div className="flex flex-row gap-2 items-center">
+                    <p className="text-xs font-medium text-[#FFFFFF99]">
+                      Current Epoch Earnings
+                    </p>
+                    {/* <Tooltip
+                      closeDelay={0}
+                      content={
+                        <>
+                          <h4>
+                            {rewardsTotal} <br />
+                            Current Epoch Earnings
+                          </h4>
+                        </>
+                      }
+                      delay={0}
+                      motionProps={{
+                        variants: {
+                          exit: {
+                            opacity: 0,
+                            transition: {
+                              duration: 0.1,
+                              ease: "easeIn",
+                            },
+                          },
+                          enter: {
+                            opacity: 1,
+                            transition: {
+                              duration: 0.15,
+                              ease: "easeOut",
+                            },
+                          },
+                        },
+                      }}
+                      // placement={"bottom"}
+                    >
+                      <IoMdInformationCircleOutline size="20" />
+                    </Tooltip> */}
+                  </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <h4 className="font-bold text-2xl text-white text-right">

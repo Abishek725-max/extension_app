@@ -99,6 +99,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
         setClaimStatus(response?.data);
         setLoadingcanClaim(false);
         setIsModalVisible(true);
+        handlegetDailyRewardStatus();
       }
     } catch (error) {
       console.error("handleGetClaimRewardStatus:", error);
@@ -159,24 +160,19 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
             <div className="flex flex-col justify-between gap-1.5">
               <div className="title-wrapper flex flex-col gap-1">
                 <h5 className="text-base font-bold text-[#0C0C0D]">
-                  Daily Rewards
+                  Daily Rewards {claimStatus?.dailyPoint} PTS
                 </h5>
               </div>
               <div className="flex flex-col gap-2 lg:gap-3">
                 {/* {claimStatus?.claimed ? ( */}
                 {claimStatus?.claimed ? (
-                  <span className="block text-md text-[#68686F] leading-4 m-0 font-medium">
-                    Daily Rewards {claimStatus?.dailyPoint} PTS
-                  </span>
-                ) : (
                   <>
-                    <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0">
-                      {/* Next Claim in:{" "} */}
-                      Login Daily to collect {claimStatus?.dailyPoint} PTS
-                      <TimeCounter targetDate={claimStatus?.nextClaim} />
-                      {/* <Countdown date={dayjs(nextClaimDateAtMidnight)} /> */}
-                    </span>
+                    <TimeCounter targetDate={claimStatus?.nextClaim} />
                   </>
+                ) : (
+                  <span className="block text-md text-[#68686F] leading-4 m-0 font-medium">
+                    Claim Your Daily Rewards
+                  </span>
                 )}
               </div>
             </div>
@@ -257,7 +253,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
                   <Lottie animationData={successAnimation} loop={true} />
                 </div>
                 <p className="m-0 text-base font-semibold text-[#FF6600]">
-                  You got 100 PTS Points!
+                  You got {claimStatus?.dailyPoint} PTS Points!
                 </p>
                 <p className="m-0 text-[#68686F] dark:text-[#9F9FA5] text-sm leading-6">
                   You have Successfully claimed. <br /> Keep the app running to

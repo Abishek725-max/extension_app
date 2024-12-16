@@ -1,8 +1,9 @@
 import * as tf from "@tensorflow/tfjs";
 let socket = null;
 let reconnectTimeout = null;
-const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
-// const url = "ws://192.168.18.89:8888/ws/v1/orch";
+// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+const url = "ws://192.168.18.129:9999";
+
 import { ethers } from "ethers";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Buffer } from "buffer";
@@ -16,6 +17,8 @@ chrome?.runtime.onInstalled.addListener(() => {
   console.log("Extension Installed");
   // connectWebSocket(url);
 });
+
+// console.log("process.env.NEXT_PUBLIC_WS_URL", NEXT_PUBLIC_WS_URL);
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("receiveMesaage", message);

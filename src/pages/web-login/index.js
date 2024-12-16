@@ -18,6 +18,11 @@ import {
 import { clearLocalStorage, setLocalStorage } from "@/utils/common";
 
 import { Spinner } from "@nextui-org/react";
+import loader from "../../assets/lottie/loader-theme.json";
+
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+});
 
 // Correct import
 
@@ -29,6 +34,7 @@ import { web3auth } from "@/utils/wallet-connect";
 import { ethers } from "ethers";
 import { generateToken } from "@/utils/base-methods";
 import { Slide, toast } from "react-toastify";
+import dynamic from "next/dynamic";
 
 const WebLogin = () => {
   const router = useRouter();
@@ -162,6 +168,17 @@ const WebLogin = () => {
       // Store user info
     } catch (error) {
       console.error("Web3Auth login error:", error);
+      toast.error("Wallet is not ready yet, Already connecting", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
     }
   };
 
@@ -198,7 +215,7 @@ const WebLogin = () => {
     } catch (error) {
       handleLogout();
       // router?.push(`/register-failed?reason=unable to connect genarate token`);
-      toast.error("unable to connect genarate token", {
+      toast.error("Account not recognized. Signup on the web and try again", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -210,7 +227,7 @@ const WebLogin = () => {
         transition: Slide,
       });
       setLoading(false);
-      console.error("Failed to generate token", error);
+      console.error("Failed to generate token", error, error?.status);
     }
   };
 
@@ -254,7 +271,9 @@ const WebLogin = () => {
         {loading ? (
           <>
             <div className="content-loader h-dvh flex flex-col justify-center items-center gap-4 p-4 w-full">
-              <Spinner size="lg" />
+              <div className="max-w-[150px] mx-auto">
+                <Lottie animationData={loader} loop={true} />
+              </div>
             </div>
           </>
         ) : (

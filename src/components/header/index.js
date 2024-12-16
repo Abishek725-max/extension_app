@@ -29,7 +29,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="p-4">
+    <header className="p-4 border-b">
       <div className="flex justify-between items-center">
         <div className="logo-wrapper">
           <Image

@@ -45,8 +45,11 @@ const TimeCounter = ({ targetDate }) => {
   return (
     <div className="flex items-center mt-1">
       {/* <p className="font-[12px] text-[#68686F] font-bold">Next Claim in : </p> */}
-
-      <p className="text-sm	font-[500] text-[#68686F]">
+      <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0">
+        {" "}
+        Next Claim in:{" "}
+      </span>
+      <p className="text-sm	font-bold text-[#000]">
         {timeLeft.days > 0 && `${timeLeft.days}d `}
         {timeLeft.hours > 0 && `${timeLeft.hours}h `}
         {timeLeft.minutes > 0 && `${timeLeft.minutes}m `}
