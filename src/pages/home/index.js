@@ -12,7 +12,7 @@ import {
   getRewardsRealTime,
   getRewardsTotal,
 } from "@/utils/base-methods";
-import PointsStatistics from "@/components/dashboard/PointsStatistics ";
+import PointsStatistics from "@/components/PointsStatistics ";
 import {
   checkRealtimeEntry,
   formatNumber,

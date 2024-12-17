@@ -2,8 +2,8 @@ import axios from "axios";
 import Router from "next/router"; // Import Router from Next.js
 import { clearLocalStorage, getLocalStorage } from "./common";
 
-let BASE_URL = "https://dataapi.openledger.dev/api/v1/";
-// let BASE_URL = "http://192.168.18.89:8081/api/v1";
+// let BASE_URL = "https://dataapi.openledger.dev/api/v1/";
+let BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const appAxios = axios.create({
   baseURL: BASE_URL,

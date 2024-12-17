@@ -1,7 +1,8 @@
 import * as tf from "@tensorflow/tfjs";
 let socket = null;
 let reconnectTimeout = null;
-const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+const url = process.env.NEXT_PUBLIC_WS_URL;
 // const url = "ws://192.168.18.89:8888/ws/v1/orch";
 
 import { ethers } from "ethers";

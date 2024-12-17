@@ -12,7 +12,6 @@ import {
   DropdownItem,
   Button,
 } from "@nextui-org/react";
-import { getDataWithId } from "@/utils/indexed-db";
 import { getLocalStorage, setLocalStorage } from "@/utils/common";
 
 const Welcome = () => {

@@ -2,7 +2,8 @@ import axios from "axios";
 import Router from "next/router"; // Import Router from Next.js
 import { clearLocalStorage, getLocalStorage } from "./common";
 
-let BASE_URL = "https://rewardapi.openledger.dev/api/v1";
+// let BASE_URL = "https://rewardapi.openledger.dev/api/v1";
+let BASE_URL = process.env.NEXT_PUBLIC_REWARDS_URL;
 
 const rewardAxios = axios.create({
   baseURL: BASE_URL,

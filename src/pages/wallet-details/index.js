@@ -93,9 +93,12 @@ const WalletDetails = () => {
       if (isConnected) {
         await web3auth.logout();
         clearLocalStorage();
-        // window.history.pushState({}, "", "/welcome.html");
-        // window.location.reload();
-        router?.push("/web-login");
+
+        // router?.push("/web-login");
+        const url = `chrome-extension://${chrome.runtime.id}/web-login.html`;
+
+        // Open the URL in a new tab
+        chrome.tabs.create({ url: url });
       } else {
         console.log("User is already logged out or not connected");
       }
