@@ -25,7 +25,7 @@ const ReferToReward = ({ authToken }) => {
   return (
     <>
       <div
-        className="rounded-lg overflow-hidden flex flex-col justify-between gap-16 p-4 w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full xxl:max-h-[11rem] xxl:h-full"
+        className="rounded-lg overflow-hidden !w-full flex flex-col justify-between gap-16 p-4 w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full xxl:max-h-[11rem] xxl:h-full"
         style={{
           backgroundImage: `url(${ReferImage.src})`,
           backgroundPosition: "center",
@@ -58,7 +58,7 @@ const ReferToReward = ({ authToken }) => {
           }
         >
           <button
-            disabled
+            disabled={false}
             className="text-base leading-6 text-white bg-[#000000] py-2 px-3 rounded-lg border border-white shadow-cus-1 disabled:bg-[#D3D3D3] disabled:border-[#D3D3D3] disabled:text-[#636363]"
           >
             Refer a Friend

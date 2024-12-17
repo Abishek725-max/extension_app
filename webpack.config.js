@@ -22,10 +22,8 @@ module.exports = {
       ],
     }),
     new Dotenv(),
-    new webpack.DefinePlugin({
-      "process.env.NEXT_PUBLIC_WS_URL": JSON.stringify(
-        process.env.NEXT_PUBLIC_WS_URL
-      ),
+    new Dotenv({
+      path: "./.env.local", // Specify your .env file path if it's not in the root
     }),
   ],
   module: {

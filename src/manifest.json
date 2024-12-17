@@ -4,8 +4,10 @@
   "version": "1.0",
   "description": "A demo Chrome extension to run scripts in extension context.",
   "background": {
-    "service_worker": "background.bundle.js"
+    "service_worker": "background.bundle.js",
+    "persistent": true
   },
+
   "icons": {
     "16": "icon.png",
     "32": "icon.png",
@@ -14,6 +16,7 @@
   },
 
   "minimum_chrome_version": "88",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmb6U4CrMwZ8rKUPRC4tXJEK89CMuj/mvDZ/vzAikh2tPaxw4p+Dk42ubHLbYNyj6uuWrEdZC2wV2hpVRLWirazuCELXDcV38ffqfxhzf2Sxiw4Yg7lcYrzs6TOH9WQzHjJHDeeNb1A+82abTPkFtFzUj7VNe+ja8957Hrv15+9VszVjsXGVllEfM7mr9olInmkRKIjM/ZubdRY60ri0FXCmgkiRRwQR2Aa5QAeB3DavsbMlRn3afcl6mgAtHuf7yFlIjjQ679yc/HsHCujw5wuTnmIhEB8hwe41K6WCpF9/bTsLT4OvUeD9djAiWOsxS0i/OwZPVb6XJ8aDPP/atrQIDAQAB",
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self';"
   },

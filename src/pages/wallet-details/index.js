@@ -82,7 +82,8 @@ const WalletDetails = () => {
   const naviagate = () => {
     // window.history.pushState({}, "", "/home.html");
     // window.location.reload();
-    router.back();
+    // router.back();
+    router.push(`/home?redirect="wallet"`);
   };
 
   const handleLogout = async () => {
@@ -148,8 +149,8 @@ const WalletDetails = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-2 border border-[#E7E7E9] rounded-lg">
-                <div className="flex items-center gap-2 px-4">
+              <div className="flex items-center mx-auto w-fit justify-center gap-2 border border-[#E7E7E9] rounded-lg">
+                <div className="flex items-center gap-2 px-2 py-2">
                   <p className="m-0 text-base text-black leading-6">
                     {truncateAddress(walletData?.address, 22)}
                   </p>
@@ -192,12 +193,12 @@ const WalletDetails = () => {
                     </div>
                   </CopyToClipboard>
                 </div>
-                <button
+                {/* <button
                   type="button"
                   className="flex w-fit justify-center items-center gap-1 rounded-lg bg-[#000] border border-[#000] px-3 py-2 text-base font-normal text-white"
                 >
                   {balanceInEther} ETH
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -206,7 +207,7 @@ const WalletDetails = () => {
             <div className="menu-title">
               <h2 className="text-sm m-0 text-[#68686F] leading-6">Settings</h2>
             </div>
-            <div className="menu-wrapper flex flex-col gap-10">
+            <div className="menu-wrapper flex flex-col">
               <div className="menu-items-wrapper flex flex-col gap-2">
                 <Link
                   href="https://discord.com/invite/EPqu5eHB"
@@ -252,8 +253,8 @@ const WalletDetails = () => {
                     </div>
                   </div>
                 </Link> */}
-              </div>
-              <div className="menu-items-wrapper flex flex-col gap-2">
+                {/* </div> */}
+                {/* <div className="menu-items-wrapper flex flex-col gap-2"> */}
                 <Link
                   href="https://x.com/OpenledgerHQ"
                   target="_blank"
@@ -322,7 +323,9 @@ const WalletDetails = () => {
       </section>
       <Modal
         onClose={hideModal}
+        hideCloseButton
         isOpen={isModalVisible}
+        isDismissable={false}
         placement="center"
         classNames={{
           base: "!max-w-[320px]",
@@ -336,7 +339,11 @@ const WalletDetails = () => {
                   Logout Confirmation
                 </p>
                 <p className="m-0 text-[#68686F] dark:text-[#9F9FA5] text-sm leading-6 mb-4">
-                  Sure you want to logout?
+                  Do you want to proceed with logging out?
+                </p>
+                <p className="m-0 text-[#68686F] dark:text-[#9F9FA5] text-sm leading-6 mb-4">
+                  Keep the app running to earn more rewards. Logging out will
+                  stop your earnings from this node.
                 </p>
                 <div className="text-center flex items-center justify-between gap-4">
                   <Button

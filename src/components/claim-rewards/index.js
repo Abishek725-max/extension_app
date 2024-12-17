@@ -147,7 +147,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
   return (
     <>
       <div
-        className="collector-card border border-[#91e8f8] relative rounded-lg w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full"
+        className="collector-card border border-[#91e8f8] !w-full relative rounded-lg w-full md:w-[48.5%] lg:w-[48.75%] xxl:w-full"
         style={{
           backgroundImage: `url(${rewardBg.src})`,
           backgroundPosition: "center",
@@ -240,6 +240,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
       <Modal
         onClose={hideModal}
         isOpen={isModalVisible}
+        isDismissable={false}
         placement="center"
         classNames={{
           base: "!max-w-[320px]",

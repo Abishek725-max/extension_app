@@ -47,10 +47,10 @@ const TimeCounter = ({ targetDate }) => {
       {/* <p className="font-[12px] text-[#68686F] font-bold">Next Claim in : </p> */}
       <span className="block text-base text-[#68686F] font-[500] text-sm leading-4 m-0">
         {" "}
-        Next Claim in:{" "}
+        Next Claim in :
       </span>
       <p className="text-sm	font-bold text-[#000]">
-        {timeLeft.days > 0 && `${timeLeft.days}d `}
+        {timeLeft.days > 0 && `${timeLeft.days} d `}
         {timeLeft.hours > 0 && `${timeLeft.hours}h `}
         {timeLeft.minutes > 0 && `${timeLeft.minutes}m `}
         {timeLeft.seconds > 0 && `${timeLeft.seconds}s`}

@@ -210,10 +210,11 @@ const WebLogin = () => {
       console.log("address", address);
       const tokenData = await generateToken(address);
       setLocalStorage("auth_token", tokenData.data.token);
-      router?.push("/home");
+      router?.push("/home?redirect=login");
       setLoading(false);
     } catch (error) {
       handleLogout();
+      clearLocalStorage();
       // router?.push(`/register-failed?reason=unable to connect genarate token`);
       toast.error("Account not recognized. Signup on the web and try again", {
         position: "top-right",
@@ -406,6 +407,7 @@ const WebLogin = () => {
             <Modal
               onClose={hideModal}
               isOpen={isModalVisible}
+              isDismissable={false}
               size="sm"
               placement="center"
             >

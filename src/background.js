@@ -1,8 +1,8 @@
 import * as tf from "@tensorflow/tfjs";
 let socket = null;
 let reconnectTimeout = null;
-// const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
-const url = "ws://192.168.18.129:9999";
+const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
+// const url = "ws://192.168.18.89:8888/ws/v1/orch";
 
 import { ethers } from "ethers";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -18,7 +18,18 @@ chrome?.runtime.onInstalled.addListener(() => {
   // connectWebSocket(url);
 });
 
-// console.log("process.env.NEXT_PUBLIC_WS_URL", NEXT_PUBLIC_WS_URL);
+chrome.alarms.create("keepAlive", {
+  periodInMinutes: 0.25, // Periodic check to prevent deactivation
+});
+
+function keepAlive() {
+  chrome.storage.local.set({ keepAlive: Date.now() });
+}
+
+// Call this periodically
+setInterval(keepAlive, 20000);
+
+console.log("process.env.NEXT_PUBLIC_WS_URL", process.env.NEXT_PUBLIC_WS_URL);
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("receiveMesaage", message);
