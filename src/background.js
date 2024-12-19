@@ -3,7 +3,6 @@ let socket = null;
 let reconnectTimeout = null;
 // const url = "wss://orchestrator.openledger.dev/ws/v1/orch";
 const url = process.env.NEXT_PUBLIC_WS_URL;
-// const url = "ws://192.168.18.89:8888/ws/v1/orch";
 
 import { ethers } from "ethers";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -19,26 +18,127 @@ chrome?.runtime.onInstalled.addListener(() => {
   // connectWebSocket(url);
 });
 
-chrome.alarms.create("keepAlive", {
-  periodInMinutes: 0.25, // Periodic check to prevent deactivation
-});
+// chrome.alarms.create("keepAlive", {
+//   periodInMinutes: 0.25, // Periodic check to prevent deactivation
+// });
 
-function keepAlive() {
-  chrome.storage.local.set({ keepAlive: Date.now() });
-}
+// function keepAlive() {
+//   chrome.storage.local.set({ keepAlive: Date.now() });
+// }
 
-// Call this periodically
-setInterval(keepAlive, 20000);
+// // Call this periodically
+// setInterval(keepAlive, 20000);
 
 console.log("process.env.NEXT_PUBLIC_WS_URL", process.env.NEXT_PUBLIC_WS_URL);
+
+// connectWebSocket(url);
+
+function connectWebSocket(url, authToken) {
+  // Function to handle WebSocket connection
+
+  function createWebSocket() {
+    console.log("Connecting to WebSocket:", url, authToken);
+
+    const wsUrl = `${url}?authToken=${authToken}`;
+    socket = new WebSocket(wsUrl);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established.");
+      clearTimeout(reconnectTimeout); // Clear any pending reconnect attempts
+      sendHeartbeat(); // Start sending heartbeats
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Message received from WebSocket:", event);
+      loadJobData(event);
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket encountered an error:", error);
+    };
+
+    socket.onclose = (event) => {
+      console.warn("WebSocket connection closed:", event);
+      reconnectWebSocket(); // Attempt reconnection
+    };
+  }
+
+  function reconnectWebSocket() {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      console.log("WebSocket is already open, no need to reconnect.");
+      return;
+    }
+
+    console.log("Reconnecting to WebSocket...");
+    reconnectTimeout = setTimeout(() => {
+      createWebSocket();
+    }, 5000); // Retry after 5 seconds
+  }
+
+  async function sendHeartbeat() {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      console.warn("Cannot send heartbeat, WebSocket is not open.");
+      return;
+    }
+
+    try {
+      const extensionId = chrome?.runtime.id;
+      const privateKey = await getLocalStorage("privateKey");
+      const wallet = new ethers.Wallet(privateKey);
+
+      const memoryInfo = await getAvailableMemoryPercentage();
+      const storageInfo = await getAvailableStoragePercentage();
+      const models = await tf.io.listModels();
+
+      const heartbeatMessage = {
+        message: {
+          Worker: {
+            Identity: extensionId,
+            ownerAddress: wallet?.address,
+            type: "LWEXT",
+            Host: `chrome-extension://${extensionId}`,
+          },
+          Capacity: {
+            AvailableMemory: memoryInfo?.availableMemoryPercentage,
+            AvailableStorage: storageInfo,
+            AvailableGPU: "",
+            AvailableModels: Object.keys(models),
+          },
+        },
+        msgType: "HEARTBEAT",
+        workerType: "LWEXT",
+        workerID: extensionId,
+      };
+
+      socket.send(JSON.stringify(heartbeatMessage));
+      console.log("Heartbeat sent:", heartbeatMessage);
+    } catch (error) {
+      console.error("Error sending heartbeat:", error);
+    }
+  }
+
+  // Start the WebSocket connection
+  createWebSocket();
+
+  // Periodically send heartbeat messages
+  setInterval(() => {
+    if (socket?.readyState === WebSocket.OPEN) {
+      sendHeartbeat();
+    } else {
+      console.warn("Skipping heartbeat, WebSocket not open.");
+    }
+  }, 30000);
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("receiveMesaage", message);
   if (message.type === "send_websocket_message" && socket) {
     socket.send(message.data);
 
-    socket.onmessage = (event) => {
+    socket.onmessage = async (event) => {
+      console.log("ReceivedJoBDataNew", event);
       sendResponse(event?.data);
+      loadJobData(event);
     };
     return true;
   }
@@ -53,134 +153,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // return true;
 });
 
-// connectWebSocket(url);
-
-export function connectWebSocket(url, authToken) {
-  // Function to handle WebSocket connection
-
-  function createWebSocket() {
-    console.log("urllll", url, authToken);
-    const wsUrl = `${url}?authToken=${authToken}`;
-    socket = new WebSocket(wsUrl);
-
-    socket.onopen = async () => {
-      // socket.ping();
-      console.log("WebSocket is connected.");
-      setInterval(async () => {
-        let privateKey = await getLocalStorage("privateKey");
-        privateKey && sendHeartbeat("HEARTBEAT SENT");
-      }, 30000);
-    };
-
-    socket.onmessage = async (event) => {
-      console.log("Message received from WebSocket:", event.data);
-
-      const message = JSON.parse(event.data);
-
-      // socket?.send(
-      //   JSON.stringify({
-      //     workerID: `chrome-extension://${chrome.runtime.id}`,
-      //     msgType: "JOB_ASSIGNED",
-      //     message: {
-      //       Status: true,
-      //       Ref: message?.data?.UUID,
-      //     },
-      //   })
-      // );
-
-      let privateKey = await getLocalStorage("privateKey");
-      console.log("🚀 ~ socket.onmessage= ~ privateKey:", privateKey);
-
-      if (privateKey) {
-        await getMarkdown(message, privateKey);
-      }
-    };
-
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    socket.onclose = (event) => {
-      console.log("WebSocket connection closed", event);
-      clearTimeout(reconnectTimeout); // Clear previous reconnect attempt
-      reconnectWebSocket(); // Try to reconnect
-    };
-  }
-
-  // Try to reconnect after a delay
-  function reconnectWebSocket() {
-    console.log("Attempting to reconnect...");
-    reconnectTimeout = setTimeout(() => {
-      createWebSocket();
-    }, 5000); // Reconnect after 5 seconds
-  }
-
-  // Start the connection
-  createWebSocket();
-
-  // Heartbeat function to keep the connection alive
-  async function sendHeartbeat() {
-    try {
-      const extensionId = chrome?.runtime.id;
-      let privateKey = await getLocalStorage("privateKey");
-      const wallet = new ethers.Wallet(privateKey);
-
-      // Retrieve available TensorFlow models (assuming you're using TensorFlow.js)
-      const models = await tf.io.listModels();
-      console.log("Available models:", models);
-
-      const memoryInfo = await getAvailableMemoryPercentage();
-      if (memoryInfo) {
-        console.log(
-          `Available Memory: ${memoryInfo.availableMemoryPercentage}%`
-        );
-      }
-
-      console.log("Storage stats:", await getAvailableStoragePercentage());
-
-      // chrome.runtime.sendMessage({ type: "GET_GPU_INFO" }, (response) => {
-      //   console.log("GPU Info:", response);
-      // });
-
-      // Get GPU info by sending a message to the content script
-
-      const heartbeatMessage = {
-        message: {
-          Worker: {
-            Identity: extensionId,
-            ownerAddress: wallet?.address,
-            type: "LWEXT",
-            Host: `chrome-extension://${extensionId}`,
-          },
-          Capacity: {
-            AvailableMemory: memoryInfo?.availableMemoryPercentage,
-            AvailableStorage: await getAvailableStoragePercentage(),
-            AvailableGPU: "",
-            AvailableModels: models ? Object.keys(models) : [],
-          },
-        },
-        msgType: "HEARTBEAT",
-        workerID: extensionId,
-      };
-
-      // Send the heartbeat message (WebSocket, etc.)
-      if (socket) {
-        socket.send(JSON.stringify(heartbeatMessage));
-        console.log("Heartbeat sent:", heartbeatMessage);
-      } else {
-        console.error("WebSocket is not open, unable to send heartbeat.");
-      }
-    } catch (error) {
-      console.error("Error sending health check response:", error);
-      if (error.response) {
-        console.error("Error response:", error.response);
-      }
-      if (error.message) {
-        console.error("Error message:", error.message);
-      }
+const loadJobData = async (event) => {
+  const message = JSON.parse(event.data);
+  console.log("message", message);
+  if (message?.MsgType == "JOB") {
+    socket?.send({
+      workerID: chrome?.runtime?.id,
+      msgType: "JOB_ASSIGNED",
+      workerType: "LWEXT",
+      message: {
+        Status: true,
+        Ref: message?.UUID,
+      },
+    });
+    const privateKey = await getLocalStorage("privateKey");
+    if (privateKey) {
+      await getMarkdown(message, privateKey);
     }
   }
-}
+};
 
 const parseValue = (value) => {
   try {
@@ -225,11 +216,11 @@ chrome.runtime.onConnectExternal.addListener((port) => {
   console.log("External connection established:", port);
 });
 
-async function getMarkdown(value, privateKey) {
-  console.log("jobData", value?.data);
-  const JobData = value?.data;
+async function getMarkdown(JobData, privateKey) {
+  console.log("jobData", JobData);
+  // const JobData = value?.data;
 
-  // Ensure the Dataset is valid before parsing
+  // Ensure the dataset is valid before parsing
   let parsedData;
 
   if (JobData?.Dataset) {
@@ -245,7 +236,7 @@ async function getMarkdown(value, privateKey) {
       return; // Exit the function if Dataset is invalid
     }
   } else {
-    console.log("Dataset is missing or invalid.");
+    console.log("dataset is missing or invalid.");
   }
 
   const bucketName = parsedData?.name;
@@ -254,18 +245,18 @@ async function getMarkdown(value, privateKey) {
     return;
   }
 
-  // Ensure the Payload is valid before parsing
+  // Ensure the payload is valid before parsing
   let payload;
   try {
     payload = JobData?.Payload ? JSON.parse(JobData?.Payload) : null;
   } catch (err) {
-    console.error("Error parsing Payload:", err);
-    return; // Exit the function if Payload is invalid
+    console.error("Error parsing payload:", err);
+    return; // Exit the function if payload is invalid
   }
 
   const urls = payload?.urls || [];
   if (urls.length === 0) {
-    console.error("No URLs found in Payload.");
+    console.error("No URLs found in payload.");
     return;
   }
 
@@ -427,7 +418,7 @@ async function ethersConnect(
   let dataNetAddress = dataset.contractAddress;
   let dataNetReference = dataset.name;
   let dataNetRequestAt = 1344537000;
-  let JobReference = jobData.ID;
+  let JobReference = jobData?.UUID;
   let storageReference = `${wallet?.address}/${jobData.Type}`;
   let storageChecksum = checksum;
   let storagedAt = checksumCreateTime;
@@ -547,6 +538,7 @@ async function ethersConnect(
           JSON.stringify({
             workerID: `chrome-extension://${chrome.runtime.id}`,
             msgType: "JOB_COMPLETION",
+            workerType: "LWEXT",
             message,
           })
         );

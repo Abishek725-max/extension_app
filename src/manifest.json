@@ -1,11 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "OpenLedger LiteWorker",
+  "name": "OpenLedger Node",
   "version": "1.0",
   "description": "A demo Chrome extension to run scripts in extension context.",
   "background": {
-    "service_worker": "background.bundle.js",
-    "persistent": true
+    "service_worker": "background.bundle.js"
   },
 
   "icons": {

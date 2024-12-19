@@ -6,13 +6,15 @@ import Profile from "../../assets/images/profile.png";
 import { Image } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { getLocalStorage } from "@/utils/common";
+import { navigate } from "../../utils/common";
 
 const Header = () => {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState(null);
 
   const handle = () => {
-    router.push("/wallet-details");
+    navigate("/wallet-details");
+    // router.push("/wallet-details");
   };
 
   useEffect(() => {

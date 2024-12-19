@@ -71,6 +71,7 @@ const Home = () => {
 
   useEffect(() => {
     getPrivateKeyValue();
+    console.log("Current URL:", window.location.href);
   }, []);
 
   const getPrivateKeyValue = async () => {
@@ -103,8 +104,9 @@ const Home = () => {
       {
         type: "send_websocket_message",
         data: JSON.stringify({
-          workerID: `chrome-extension://${extensionID}`,
+          workerID: extensionID,
           msgType: "REGISTER",
+          workerType: "LWEXT",
           message: {
             id: uuidv4(),
             type: "REGISTER",
@@ -112,7 +114,7 @@ const Home = () => {
               host: `chrome-extension://${extensionID}`,
               identity: extensionID,
               ownerAddress: address ?? "",
-              type: "Extension",
+              type: "LWEXT",
             },
           },
         }),
@@ -265,7 +267,7 @@ const Home = () => {
   return (
     <>
       <>
-        <section className="max-w-[360px] w-full mx-auto bg-[#ffffff] min-h-[100vh] flex flex-col">
+        <section className="hide-vertical-scrollbar max-w-[360px] w-full h-[100vh] mx-auto bg-[#ffffff] min-h-[100vh] flex flex-col">
           {loading ? (
             <>
               <div className="content-loader h-dvh flex flex-col justify-center items-center gap-4 p-4 w-full">

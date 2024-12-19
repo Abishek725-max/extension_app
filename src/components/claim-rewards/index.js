@@ -239,6 +239,7 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
       </Modal> */}
       <Modal
         onClose={hideModal}
+        hideCloseButton
         isOpen={isModalVisible}
         isDismissable={false}
         placement="center"

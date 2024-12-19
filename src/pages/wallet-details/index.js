@@ -34,6 +34,7 @@ import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { CHAIN_NAMESPACES, IProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { web3auth } from "@/utils/wallet-connect";
+import { navigate } from "../../utils/common";
 
 const WalletDetails = () => {
   const router = useRouter();
@@ -79,11 +80,9 @@ const WalletDetails = () => {
     }
   };
 
-  const naviagate = () => {
-    // window.history.pushState({}, "", "/home.html");
-    // window.location.reload();
-    // router.back();
-    router.push(`/home?redirect="wallet"`);
+  const naviagateToRedirect = () => {
+    // router.push(`/home?redirect="wallet"`);
+    navigate(`/home`, `?redirect="wallet"`);
   };
 
   const handleLogout = async () => {
@@ -111,7 +110,7 @@ const WalletDetails = () => {
   return (
     <>
       <div className="flex items-center gap-2.5 p-4 border-b">
-        <div className="icon cursor-pointer" onClick={naviagate}>
+        <div className="icon cursor-pointer" onClick={naviagateToRedirect}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -244,7 +243,10 @@ const WalletDetails = () => {
                     </div>
                   </div>
                 </Link>
-                {/* <Link href="/" target="_blank" className="text-black">
+                <div
+                  className="text-black cursor-pointer"
+                  onClick={() => navigate("/about")}
+                >
                   <div className="menu-item flex gap-3 items-center py-2.5">
                     <div className="icon">
                       <GrCircleInformation fontSize={"1.5rem"} />
@@ -255,7 +257,7 @@ const WalletDetails = () => {
                       </p>
                     </div>
                   </div>
-                </Link> */}
+                </div>
                 {/* </div> */}
                 {/* <div className="menu-items-wrapper flex flex-col gap-2"> */}
                 <Link

@@ -12,7 +12,7 @@ import {
   DropdownItem,
   Button,
 } from "@nextui-org/react";
-import { getLocalStorage, setLocalStorage } from "@/utils/common";
+import { getLocalStorage, navigate, setLocalStorage } from "@/utils/common";
 
 const Welcome = () => {
   const router = useRouter();
@@ -29,7 +29,8 @@ const Welcome = () => {
 
     setTimeout(async () => {
       if (result) {
-        router?.push(`/home`);
+        // router?.push(`/home`);
+        navigate("/home");
       } else {
         // router?.push("/web-login");
         const url = `chrome-extension://${chrome.runtime.id}/web-login.html`;

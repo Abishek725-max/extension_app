@@ -35,6 +35,7 @@ import { ethers } from "ethers";
 import { generateToken } from "@/utils/base-methods";
 import { Slide, toast } from "react-toastify";
 import dynamic from "next/dynamic";
+import { navigate } from "../../utils/common";
 
 const WebLogin = () => {
   const router = useRouter();
@@ -210,7 +211,7 @@ const WebLogin = () => {
       console.log("address", address);
       const tokenData = await generateToken(address);
       setLocalStorage("auth_token", tokenData.data.token);
-      router?.push("/home?redirect=login");
+      router.push("/home.html?redirect=login");
       setLoading(false);
     } catch (error) {
       handleLogout();
@@ -406,6 +407,7 @@ const WebLogin = () => {
 
             <Modal
               onClose={hideModal}
+              hideCloseButton
               isOpen={isModalVisible}
               isDismissable={false}
               size="sm"

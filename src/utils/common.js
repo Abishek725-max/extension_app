@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import Router from "next/router";
 
 export const formatWalletAddress = (walletAddress) => {
   if (walletAddress) {
@@ -240,3 +241,9 @@ export async function getAvailableStoragePercentage() {
     return null;
   }
 }
+
+export const navigate = (target, redirect = "") => {
+  if (window.location.href && window.location.href.includes(".html"))
+    Router.push(`${target}.html${redirect}`);
+  else Router.push(`${target}${redirect}`);
+};
