@@ -19,6 +19,7 @@ import Countdown from "react-countdown";
 import dayjs from "dayjs";
 // import Lottie from "lottie-react";
 import dynamic from "next/dynamic";
+import { Slide, toast } from "react-toastify";
 const Lottie = dynamic(() => import("lottie-react"), {
   ssr: false,
 });
@@ -116,6 +117,17 @@ const ClaimRewards = ({ authToken, handleGetRewardRealtime = () => {} }) => {
       }
     } catch (error) {
       console.log("🚀 ~ handlegetDailyRewardStatus ~ error:", error);
+      toast.error("No earning to collect", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
 
       if (error !== undefined && error?.data?.status === 404) {
         setDailyRewardDataStatus(error?.data);

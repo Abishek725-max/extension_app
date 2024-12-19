@@ -270,7 +270,7 @@ const WebLogin = () => {
   return (
     <>
       <main className="max-w-[360px] gap-3 w-full mx-auto bg-[#FFFFFF] h-[100vh] flex flex-col">
-        {loading ? (
+        {false ? (
           <>
             <div className="content-loader h-dvh flex flex-col justify-center items-center gap-4 p-4 w-full">
               <div className="max-w-[150px] mx-auto">
@@ -311,7 +311,7 @@ const WebLogin = () => {
                 <Image
                   alt="logo"
                   src={logo.src}
-                  className="h-auto w-[6.5rem] object-contain"
+                  className="h-auto w-[5rem] object-contain"
                 />
               </div>
             </div>
@@ -335,6 +335,7 @@ const WebLogin = () => {
                   <button
                     onClick={() => setIsModalVisible(true)}
                     type="button"
+                    disabled={loading}
                     className="mt-4 flex w-full justify-center items-center gap-2 rounded-lg bg-[#ff6600] border border-[#FF6600] px-3 py-2 max-w-[290px] mx-auto text-base font-bold text-white"
                   >
                     <svg
@@ -379,9 +380,10 @@ const WebLogin = () => {
                   <button
                     onClick={handleweb3Auth}
                     type="button"
+                    disabled={loading}
                     className="mt-4 flex w-full justify-center items-center gap-2 rounded-lg bg-[#fff] border border-[#FF6600] px-3 py-2 max-w-[290px] mx-auto text-base font-bold text-black"
                   >
-                    Login Node
+                    {loading ? "Loading..." : "Login Node"}
                   </button>
 
                   <p className="m-0 text-xs leading-6 text-[#52525B] mt-6 text-center">

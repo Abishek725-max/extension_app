@@ -34,7 +34,7 @@ import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { CHAIN_NAMESPACES, IProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { web3auth } from "@/utils/wallet-connect";
-import { navigate } from "../../utils/common";
+import { checkLogin, navigate } from "../../utils/common";
 
 const WalletDetails = () => {
   const router = useRouter();
@@ -56,6 +56,7 @@ const WalletDetails = () => {
   const [balanceInEther, setBalanceInEther] = useState(0);
 
   useEffect(() => {
+    checkLogin();
     walletDetailGet();
     web3auth?.init();
   }, []);

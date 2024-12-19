@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useRouter } from "next/router";
 import animationData from "../../assets/lottie/sad.json";
@@ -6,6 +6,7 @@ import Logo from "../../assets/images/icon.png";
 // import Lottie from "lottie-react";
 import { useSearchParams } from "next/navigation";
 import { Image } from "@nextui-org/react";
+import { checkLogin } from "../../utils/common";
 
 const About = () => {
   const router = useRouter();
@@ -13,6 +14,10 @@ const About = () => {
 
   // Access the version dynamically
   const extensionVersion = manifest?.version;
+
+  useEffect(() => {
+    checkLogin();
+  }, []);
 
   return (
     <>

@@ -7,6 +7,7 @@ import { Image } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { getLocalStorage } from "@/utils/common";
 import { navigate } from "../../utils/common";
+import { RiRefreshLine } from "react-icons/ri";
 
 const Header = () => {
   const router = useRouter();
@@ -15,6 +16,10 @@ const Header = () => {
   const handle = () => {
     navigate("/wallet-details");
     // router.push("/wallet-details");
+  };
+
+  const reload = () => {
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -37,10 +42,11 @@ const Header = () => {
           <Image
             alt="logo"
             src={Logo.src || "/assets/images/logo.png"}
-            className="h-auto w-[62px]"
+            className="h-auto w-[5rem] object-contain"
           />
         </div>
-        <div className="menu-wrapper">
+        <div className="menu-wrapper flex items-center gap-4">
+          <RiRefreshLine onClick={reload} className="w-8 h-8" />
           <div className="flex items-center gap-3">
             <div className="profile cursor-pointer" onClick={handle}>
               <Image

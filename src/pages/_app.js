@@ -8,8 +8,11 @@ import "react-toastify/dist/ReactToastify.css";
 import Providers from "../contextApi/Providers";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { getLocalStorage } from "@/utils/common";
 
 export default function App({ Component, pageProps }) {
+  console.log("AppPage lOAded");
+
   return (
     <Providers>
       <Component {...pageProps} />

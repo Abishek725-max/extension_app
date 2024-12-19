@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+
 import Router from "next/router";
 
 export const formatWalletAddress = (walletAddress) => {
@@ -246,4 +247,12 @@ export const navigate = (target, redirect = "") => {
   if (window.location.href && window.location.href.includes(".html"))
     Router.push(`${target}.html${redirect}`);
   else Router.push(`${target}${redirect}`);
+};
+
+export const checkLogin = async () => {
+  const result = await getLocalStorage("auth_token");
+  console.log("Result:", result);
+  if (!result) {
+    Router.push("/web-login.html");
+  }
 };

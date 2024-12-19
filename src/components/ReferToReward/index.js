@@ -44,17 +44,20 @@ const ReferToReward = ({ authToken }) => {
         <CopyToClipboard
           text={`https://devnet.openledger.dev/?referral_code=${refercode}`}
           onCopy={() =>
-            toast?.success("Copied to clipboard!", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "colored",
-              transition: Slide,
-            })
+            toast?.success(
+              `Link copied to clipboard! Send it to everyone https://devnet.openledger.dev/?referral_code=${refercode}`,
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Slide,
+              }
+            )
           }
         >
           <button

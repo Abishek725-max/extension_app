@@ -18,16 +18,16 @@ chrome?.runtime.onInstalled.addListener(() => {
   // connectWebSocket(url);
 });
 
-// chrome.alarms.create("keepAlive", {
-//   periodInMinutes: 0.25, // Periodic check to prevent deactivation
-// });
+chrome.alarms.create("keepAlive", {
+  periodInMinutes: 0.25, // Periodic check to prevent deactivation
+});
 
-// function keepAlive() {
-//   chrome.storage.local.set({ keepAlive: Date.now() });
-// }
+function keepAlive() {
+  chrome.storage.local.set({ keepAlive: Date.now() });
+}
 
-// // Call this periodically
-// setInterval(keepAlive, 20000);
+// Call this periodically
+setInterval(keepAlive, 20000);
 
 console.log("process.env.NEXT_PUBLIC_WS_URL", process.env.NEXT_PUBLIC_WS_URL);
 
@@ -44,8 +44,7 @@ function connectWebSocket(url, authToken) {
 
     socket.onopen = () => {
       console.log("WebSocket connection established.");
-      clearTimeout(reconnectTimeout); // Clear any pending reconnect attempts
-      sendHeartbeat(); // Start sending heartbeats
+      clearTimeout(reconnectTimeout);
     };
 
     socket.onmessage = (event) => {
@@ -59,7 +58,8 @@ function connectWebSocket(url, authToken) {
 
     socket.onclose = (event) => {
       console.warn("WebSocket connection closed:", event);
-      reconnectWebSocket(); // Attempt reconnection
+      reconnectWebSocket();
+      clearInterval();
     };
   }
 
@@ -93,7 +93,7 @@ function connectWebSocket(url, authToken) {
       const heartbeatMessage = {
         message: {
           Worker: {
-            Identity: extensionId,
+            Identity: base64Encode(wallet?.address),
             ownerAddress: wallet?.address,
             type: "LWEXT",
             Host: `chrome-extension://${extensionId}`,
@@ -107,7 +107,7 @@ function connectWebSocket(url, authToken) {
         },
         msgType: "HEARTBEAT",
         workerType: "LWEXT",
-        workerID: extensionId,
+        workerID: base64Encode(wallet?.address),
       };
 
       socket.send(JSON.stringify(heartbeatMessage));
@@ -121,9 +121,10 @@ function connectWebSocket(url, authToken) {
   createWebSocket();
 
   // Periodically send heartbeat messages
-  setInterval(() => {
+  setInterval(async () => {
     if (socket?.readyState === WebSocket.OPEN) {
-      sendHeartbeat();
+      let auth_token = await getLocalStorage("auth_token");
+      auth_token && sendHeartbeat();
     } else {
       console.warn("Skipping heartbeat, WebSocket not open.");
     }
@@ -153,12 +154,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // return true;
 });
 
+const base64Encode = (input) => {
+  return btoa(input);
+};
+
 const loadJobData = async (event) => {
+  const privateKey = await getLocalStorage("privateKey");
+  const wallet = new ethers.Wallet(privateKey);
   const message = JSON.parse(event.data);
   console.log("message", message);
   if (message?.MsgType == "JOB") {
     socket?.send({
-      workerID: chrome?.runtime?.id,
+      workerID: base64Encode(wallet?.address),
       msgType: "JOB_ASSIGNED",
       workerType: "LWEXT",
       message: {
@@ -536,7 +543,7 @@ async function ethersConnect(
       if (socket) {
         socket.send(
           JSON.stringify({
-            workerID: `chrome-extension://${chrome.runtime.id}`,
+            workerID: base64Encode(wallet?.address),
             msgType: "JOB_COMPLETION",
             workerType: "LWEXT",
             message,

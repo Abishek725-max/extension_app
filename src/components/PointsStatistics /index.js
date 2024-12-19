@@ -6,12 +6,12 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css"; // Optional for styling
 import {
   calculatePercentage,
+  checkRealtimeEntry,
   epochPointsWithHeight,
   latestEntry,
   maxTotal,
   realTimeDataHeightCalc,
 } from "./common";
-import { checkRealtimeEntry } from "@/utils/common";
 
 const BarChart = ({ type, barValue, total = 0 }) => {
   return (
@@ -199,7 +199,16 @@ const PointsStatistics = ({ data, realTimeData, rewardsRealTimeDataArray }) => {
                       placement="right"
                       key={`statitics_${index}`}
                     >
-                      <div className={`chart-view`} key={index}>
+                      <div
+                        className={`chart-view ${
+                          rewardsRealTimeDataArray.length > 0 &&
+                          checkRealtimeDateinHistory === items.date
+                            ? "latest-chart"
+                            : ""
+                        }
+                    `}
+                        key={index}
+                      >
                         <h6 className="txt-bx bg-[#1b1b1d] text-[#f2f3f9] dark:bg-white dark:text-[#161618]">
                           {items?.total_points}
                         </h6>
